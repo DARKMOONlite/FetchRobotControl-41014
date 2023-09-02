@@ -2,4 +2,3 @@
 controlling a fetch robotic arm via visual servoing in ROS1 Melodic
 
 Contributors: Angus Cheng, Sebastian Schroder, Zahne Simon
-new change
