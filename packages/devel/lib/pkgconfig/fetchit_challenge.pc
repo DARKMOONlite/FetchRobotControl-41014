@@ -1,0 +1,8 @@
+prefix=/home/sebastian/git/FetchRobotControl-41014/packages/devel
+
+Name: fetchit_challenge
+Description: Description of fetchit_challenge
+Version: 0.9.2
+Cflags: -I/home/sebastian/git/FetchRobotControl-41014/packages/devel/include
+Libs: -L${prefix}/lib 
+Requires: 

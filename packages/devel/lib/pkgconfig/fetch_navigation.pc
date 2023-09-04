@@ -1,0 +1,8 @@
+prefix=/home/sebastian/git/FetchRobotControl-41014/packages/devel
+
+Name: fetch_navigation
+Description: Description of fetch_navigation
+Version: 0.8.3
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

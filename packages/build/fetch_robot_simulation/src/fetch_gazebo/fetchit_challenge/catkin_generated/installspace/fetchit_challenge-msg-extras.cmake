@@ -1,0 +1,2 @@
+set(fetchit_challenge_MESSAGE_FILES "msg/SchunkMachineAction.msg;msg/SchunkMachineActionGoal.msg;msg/SchunkMachineActionResult.msg;msg/SchunkMachineActionFeedback.msg;msg/SchunkMachineGoal.msg;msg/SchunkMachineResult.msg;msg/SchunkMachineFeedback.msg;msg/SickCameraAction.msg;msg/SickCameraActionGoal.msg;msg/SickCameraActionResult.msg;msg/SickCameraActionFeedback.msg;msg/SickCameraGoal.msg;msg/SickCameraResult.msg;msg/SickCameraFeedback.msg")
+set(fetchit_challenge_SERVICE_FILES "")

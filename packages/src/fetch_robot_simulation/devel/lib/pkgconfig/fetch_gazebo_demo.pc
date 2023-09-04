@@ -1,0 +1,8 @@
+prefix=/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/devel
+
+Name: fetch_gazebo_demo
+Description: Description of fetch_gazebo_demo
+Version: 0.9.2
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
