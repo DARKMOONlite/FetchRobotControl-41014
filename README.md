@@ -29,3 +29,7 @@ source devel/setup.bash
 ```bash
 roslaunch fetch_gazebo simulation.launch
 ```
+6. Download the realsense2 camera packages. [link to relavent question](https://answers.ros.org/question/364033/realsense2_camera-cannot-locate-rosdep-definition-for-librealsense2/)
+```bash
+sudo apt-get install ros-melodic-realsense2-camera ros-melodic-realsense2-description ros-melodic-librealsense2
+```
