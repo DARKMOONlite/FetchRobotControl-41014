@@ -1,8 +1,0 @@
-prefix=/home/sebastian/git/FetchRobotControl-41014/packages/install
-
-Name: fetch_ikfast_plugin
-Description: Description of fetch_ikfast_plugin
-Version: 0.8.3
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

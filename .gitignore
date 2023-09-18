@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+
+# added build and devel folders for ros
+build/
+devel/

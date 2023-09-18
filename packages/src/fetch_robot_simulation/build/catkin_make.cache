@@ -1,2 +1,0 @@
-fetch_gazebo/fetch_gazebo:fetch_gazebo/fetch_gazebo_demo:fetch_gazebo/fetch_simulation:fetch_gazebo/fetchit_challenge
--DCATKIN_DEVEL_PREFIX=/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/devel -DCMAKE_INSTALL_PREFIX=/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/install -G Unix Makefiles

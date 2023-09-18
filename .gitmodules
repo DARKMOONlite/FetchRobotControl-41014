@@ -1,0 +1,3 @@
+[submodule "packages/src/fetch_robot_simulation/src/fetch_gazebo"]
+	path = packages/src/fetch_robot_simulation/src/fetch_gazebo
+	url = https://github.com/ZebraDevs/fetch_gazebo.git
