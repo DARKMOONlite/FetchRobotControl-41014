@@ -21,3 +21,11 @@
 	path = packages/src/dependency-packages/panda_moveit_config
 	url = https://github.com/ros-planning/panda_moveit_config.git
 	branch = melodic-devel
+[submodule "packages/src/dependency-packages/moveit_task_constructor"]
+	path = packages/src/dependency-packages/moveit_task_constructor
+	url = https://github.com/bostoncleek/moveit_task_constructor.git
+	branch = pr-deep_grasp_stage
+[submodule "packages/src/dependency-packages/deep_grasp_demo"]
+	path = packages/src/dependency-packages/deep_grasp_demo
+	url = https://github.com/bostoncleek/deep_grasp_demo.git
+	branch = update_generators
