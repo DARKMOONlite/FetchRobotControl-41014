@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7.2)
-project(fetch_gazebo_demo)
+project(scfms_moveit)
 
 find_package(catkin)
 catkin_package()

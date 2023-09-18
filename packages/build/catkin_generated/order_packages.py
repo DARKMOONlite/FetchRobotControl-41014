@@ -2,4 +2,4 @@
 source_root_dir = '/home/sebastian/git/FetchRobotControl-41014/packages/src'
 whitelisted_packages = ''.split(';') if '' != '' else []
 blacklisted_packages = ''.split(';') if '' != '' else []
-underlay_workspaces = '/home/sebastian/git/FetchRobotControl-41014/packages/devel;/opt/ros/melodic'.split(';') if '/home/sebastian/git/FetchRobotControl-41014/packages/devel;/opt/ros/melodic' != '' else []
+underlay_workspaces = '/opt/ros/melodic'.split(';') if '/opt/ros/melodic' != '' else []

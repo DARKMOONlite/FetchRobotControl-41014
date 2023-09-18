@@ -1,0 +1,8 @@
+prefix=/home/sebastian/git/FetchRobotControl-41014/packages/devel
+
+Name: scfms_rgbd
+Description: Description of scfms_rgbd
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

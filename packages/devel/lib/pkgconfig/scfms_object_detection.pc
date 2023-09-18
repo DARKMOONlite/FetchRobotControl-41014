@@ -1,0 +1,8 @@
+prefix=/home/sebastian/git/FetchRobotControl-41014/packages/devel
+
+Name: scfms_object_detection
+Description: Description of scfms_object_detection
+Version: 0.0.1
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

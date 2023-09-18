@@ -545,6 +545,60 @@ fetch_robot_simulation/src/fetch_gazebo/fetch_simulation/preinstall:
 .PHONY : fetch_robot_simulation/src/fetch_gazebo/fetch_simulation/preinstall
 
 #=============================================================================
+# Directory level rules for directory scfms/moveit
+
+# Convenience name for "all" pass in the directory.
+scfms/moveit/all:
+
+.PHONY : scfms/moveit/all
+
+# Convenience name for "clean" pass in the directory.
+scfms/moveit/clean:
+
+.PHONY : scfms/moveit/clean
+
+# Convenience name for "preinstall" pass in the directory.
+scfms/moveit/preinstall:
+
+.PHONY : scfms/moveit/preinstall
+
+#=============================================================================
+# Directory level rules for directory scfms/object_detection
+
+# Convenience name for "all" pass in the directory.
+scfms/object_detection/all:
+
+.PHONY : scfms/object_detection/all
+
+# Convenience name for "clean" pass in the directory.
+scfms/object_detection/clean:
+
+.PHONY : scfms/object_detection/clean
+
+# Convenience name for "preinstall" pass in the directory.
+scfms/object_detection/preinstall:
+
+.PHONY : scfms/object_detection/preinstall
+
+#=============================================================================
+# Directory level rules for directory scfms/rgbd
+
+# Convenience name for "all" pass in the directory.
+scfms/rgbd/all:
+
+.PHONY : scfms/rgbd/all
+
+# Convenience name for "clean" pass in the directory.
+scfms/rgbd/clean:
+
+.PHONY : scfms/rgbd/clean
+
+# Convenience name for "preinstall" pass in the directory.
+scfms/rgbd/preinstall:
+
+.PHONY : scfms/rgbd/preinstall
+
+#=============================================================================
 # Directory level rules for directory fetch_ros/fetch_navigation
 
 # Convenience name for "all" pass in the directory.
