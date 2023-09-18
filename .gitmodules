@@ -13,3 +13,15 @@
 [submodule "packages/src/dependency-packages/rviz_visual_tools"]
 	path = packages/src/dependency-packages/rviz_visual_tools
 	url = https://github.com/PickNikRobotics/rviz_visual_tools.git
+[submodule "packages/src/dependency-packages/-b"]
+	path = packages/src/dependency-packages/-b
+	url = https://github.com/ros-planning/moveit_tutorials.git
+[submodule "packages/src/dependency-packages/moveit_tutorials"]
+	path = packages/src/dependency-packages/moveit_tutorials
+	url = https://github.com/ros-planning/moveit_tutorials.git
+[submodule "packages/src/dependency-packages/panda_moveit_config"]
+	path = packages/src/dependency-packages/panda_moveit_config
+	url = https://github.com/ros-planning/panda_moveit_config.git
+[submodule "packages/src/dependency-packages/franka_ros"]
+	path = packages/src/dependency-packages/franka_ros
+	url = https://github.com/frankaemika/franka_ros.git
