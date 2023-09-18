@@ -1,27 +1,23 @@
 [submodule "packages/src/fetch_robot_simulation/src/fetch_gazebo"]
 	path = packages/src/fetch_robot_simulation/src/fetch_gazebo
 	url = https://github.com/ZebraDevs/fetch_gazebo.git
+	branch = gazebo9
 [submodule "packages/src/fetch_robot_simulation/src/fetch_ros"]
 	path = packages/src/fetch_robot_simulation/src/fetch_ros
 	url = https://github.com/ZebraDevs/fetch_ros.git
+	branch = melodic-devel
 [submodule "packages/src/dependency-packages/moveit_grasps"]
 	path = packages/src/dependency-packages/moveit_grasps
-	url = https://github.com/ros-planning/moveit_grasps/tree/melodic-devel
-[submodule "packages/src/dependency-packages/moveit"]
-	path = packages/src/dependency-packages/moveit
-	url = https://github.com/ros-planning/moveit.git
+	url = https://github.com/ros-planning/moveit_grasps.git
+	branch = melodic-devel
 [submodule "packages/src/dependency-packages/rviz_visual_tools"]
 	path = packages/src/dependency-packages/rviz_visual_tools
 	url = https://github.com/PickNikRobotics/rviz_visual_tools.git
-[submodule "packages/src/dependency-packages/-b"]
-	path = packages/src/dependency-packages/-b
-	url = https://github.com/ros-planning/moveit_tutorials.git
 [submodule "packages/src/dependency-packages/moveit_tutorials"]
 	path = packages/src/dependency-packages/moveit_tutorials
 	url = https://github.com/ros-planning/moveit_tutorials.git
+	branch = melodic-devel
 [submodule "packages/src/dependency-packages/panda_moveit_config"]
 	path = packages/src/dependency-packages/panda_moveit_config
 	url = https://github.com/ros-planning/panda_moveit_config.git
-[submodule "packages/src/dependency-packages/franka_ros"]
-	path = packages/src/dependency-packages/franka_ros
-	url = https://github.com/frankaemika/franka_ros.git
+	branch = melodic-devel
