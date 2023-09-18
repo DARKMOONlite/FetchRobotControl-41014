@@ -34,7 +34,7 @@ ros-melodic-fetch-navigation ros-melodic-fetch-tools  ros-melodic-robot-controll
 ```
 7. install other necessary packages.
 ```bash
-    sudo apt-get install ros-melodic-moveit ros-melodic-simple-grasping
+    sudo apt-get install ros-melodic-moveit ros-melodic-simple-grasping ros-melodic-moveit-visual-tools ros-melodic-rosparam-shortcuts
 ```
 
 
