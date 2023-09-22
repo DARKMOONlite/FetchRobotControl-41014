@@ -31,4 +31,4 @@
 	branch = update_generators
 [submodule "packages/src/dependency-packages/gpd_ros"]
 	path = packages/src/dependency-packages/gpd_ros
-	url = https://github.com/atenpas/gpd_ros.git
+	url = https://github.com/DARKMOONlite/gpd_ros.git
