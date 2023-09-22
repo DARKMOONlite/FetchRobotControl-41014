@@ -40,7 +40,8 @@ ros-melodic-fetch-navigation ros-melodic-fetch-tools  ros-melodic-robot-controll
 
 
 ## Deep Grasps
-- follow the steps on the [deep grasps git page](https://github.com/PickNikRobotics/deep_grasp_demo/blob/master/README.md).
+- follow the steps from Getting started to the end of the `install grasp pose detection` on the [deep grasps git page](https://github.com/PickNikRobotics/deep_grasp_demo/blob/master/README.md). **Please Install inside the download folder to keep it consistent between us**
+- then follow the setup guide for the [ros-gpd package](https://github.com/atenpas/gpd_ros), you do not need to clone it yourself, nor edit the package, so skip that step as its included as a submodule in this git repo. 
 
 - particular versions of `moveit_task_planner` & `deep_grasps_demo` wer needed to make them run correctly. these changes were inspired by [this thread](https://github.com/PickNikRobotics/deep_grasp_demo/issues/15).
 
