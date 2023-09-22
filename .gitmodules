@@ -29,3 +29,6 @@
 	path = packages/src/dependency-packages/deep_grasp_demo
 	url = https://github.com/bostoncleek/deep_grasp_demo.git
 	branch = update_generators
+[submodule "packages/src/dependency-packages/gpd_ros"]
+	path = packages/src/dependency-packages/gpd_ros
+	url = https://github.com/atenpas/gpd_ros.git
