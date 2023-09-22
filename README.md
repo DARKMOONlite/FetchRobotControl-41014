@@ -40,10 +40,12 @@ ros-melodic-fetch-navigation ros-melodic-fetch-tools  ros-melodic-robot-controll
 
 
 ## Deep Grasps
-- follow the steps on the [deep grasps git page](https://github.com/PickNikRobotics/deep_grasp_demo/blob/master/README.md)
+- follow the steps on the [deep grasps git page](https://github.com/PickNikRobotics/deep_grasp_demo/blob/master/README.md).
+
+- particular versions of `moveit_task_planner` & `deep_grasps_demo` wer needed to make them run correctly. these changes were inspired by [this thread](https://github.com/PickNikRobotics/deep_grasp_demo/issues/15).
 
 
-### Demos
+## Demos
 - **here's a list of interesting demos, that you should check work on your machine. if any packages are missing, please add them to the aboce package list.**
 
     - ```roslaunch fetch_moveit_config demo.launch ``` *[moveit demo](https://docs.fetchrobotics.com/manipulation.html)*
