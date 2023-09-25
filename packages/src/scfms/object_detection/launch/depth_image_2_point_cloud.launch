@@ -1,0 +1,25 @@
+<launch>
+    <arg name="bag" default="/home/sebastian/Downloads/d435i_walking.bag"></arg>
+
+
+    <include file="$(find realsense2_camera)/launch/rs_from_file.launch">
+        <arg name="rosbag_filename" value="$(arg bag)"></arg>
+    </include>
+
+    <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"></node> <!-- nodelet manager http://wiki.ros.org/depth_image_proc -->
+
+    <arg name="depth_topic" value="/camera/depth/image_rect_raw"></arg>
+
+    <node pkg="image_view" type="image_view" name="depth_viewer" output="screen">
+        <remap from="image" to="$(arg depth_topic)"></remap>
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="nodelet1"
+        args="load depth_image_proc/point_cloud_xyz nodelet_manager">
+        <remap from="camera_info" to="/camera/depth/camera_info" />
+        <remap from="image_rect" to="/camera/depth/image_rect_raw" />
+        <remap from="points" to="/camera/depth/points" />
+    </node>
+
+    <include file="$(find scfms_object_detection)/launch/rviz_pointcloud.launch"> </include>
+</launch>

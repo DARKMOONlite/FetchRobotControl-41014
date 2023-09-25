@@ -8,7 +8,7 @@
   <maintainer email="Sebastian.Schroder@student.uts.edu.au"> Sebastian Schroder</maintainer>
   <license>TODO</license>
 
-  
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>actionlib</run_depend>
@@ -19,7 +19,7 @@
   <run_depend>moveit_python</run_depend>
   <run_depend>simple_grasping</run_depend>
   <run_depend>teleop_twist_keyboard</run_depend>
+  <run_depend>gpd_ros</run_depend>
 
 
-  <run_depend></run_depend>
 </package>
