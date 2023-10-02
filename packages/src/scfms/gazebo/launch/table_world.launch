@@ -1,0 +1,14 @@
+<launch>
+
+    <env name="GAZEBO_MODEL_PATH" value="$(find scfms_gazebo)/models"/>
+    <env name="GAZEBO_MEDIA_PATH" value="$(find scfms_gazebo)/models"/>
+
+
+    <arg name="extra_gazebo_args" default="--verbose"/>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find scfms_gazebo)/worlds/table.world"/>
+        <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>
+        <!-- more default parameters can be changed here -->
+    </include>
+</launch>
