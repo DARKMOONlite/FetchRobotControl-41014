@@ -15,6 +15,8 @@
 // #include <pcl/point_cloud.h>
 
 
+//? taken from the Point cloud library example code http://pointclouds.org/documentation/tutorials/planar_segmentation.html#planar-segmentation
+
 void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
      ROS_INFO("Point Cloud msg Received ");
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
