@@ -10,7 +10,7 @@
 
 
   <buildtool_depend>catkin</buildtool_depend>
-
+  <build_depend>cmake_modules</build_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>fetch_gazebo</run_depend>
   <run_depend>fetch_moveit_config</run_depend>
@@ -20,6 +20,8 @@
   <run_depend>simple_grasping</run_depend>
   <run_depend>teleop_twist_keyboard</run_depend>
   <run_depend>gpd_ros</run_depend>
-
+  <run_depend>Eigen</run_depend>
+  <run_depend>pcl</run_depend>
+  <run_depend>pcl-conversions</run_depend>
 
 </package>

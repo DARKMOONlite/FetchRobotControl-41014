@@ -1,10 +1,13 @@
 <sdf version='1.6'>
   <world name='default'>
     
-    <include><uri>model://Table</uri></include>
+    <include>
+        <uri>model://Table</uri>
+        <pose>3 0 0 0 0 0</pose>
+    </include>
     <include>
         <uri>model://coke_can</uri>
-        <pose>0 0 5 0 0 0 </pose>
+        <pose>3 0 5 0 0 0 </pose>
     </include>
     
     <light name='sun' type='directional'>
