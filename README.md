@@ -10,7 +10,7 @@ Contributors: Angus Cheng, Sebastian Schroder, Zahne Simon
 
 2. clone the repo 
 ```bash
-    git clone https://github.com/DARKMOONlite/FetchRobotControl-41014.git
+    git clone --recursive https://github.com/DARKMOONlite/FetchRobotControl-41014.git
 ```
 
 3. install the required dependencies:

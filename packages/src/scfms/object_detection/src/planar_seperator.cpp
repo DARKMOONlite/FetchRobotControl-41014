@@ -32,7 +32,7 @@ void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
   // Mandatory
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.01);
+  seg.setDistanceThreshold (1);
 
   seg.setInputCloud (cloud);
   seg.segment (*inliers, *coefficients);
@@ -70,7 +70,7 @@ int main(int argc, char ** argv){
     ros::NodeHandle n;
 
 
-    ros::Subscriber sub = n.subscribe("/head_camera/depth_downsample/points",1000,pointCloudCallback);
+    ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1000,pointCloudCallback);
 
     ros::spin();
 
