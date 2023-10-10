@@ -20,6 +20,9 @@ link_directories()
 add_executable(planar_Seperator src/planar_seperator.cpp)
 target_link_libraries(planar_Seperator ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
+add_executable(border_extractor src/border_extractor.cpp)
+target_link_libraries(border_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
 install(
   DIRECTORY launch config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
