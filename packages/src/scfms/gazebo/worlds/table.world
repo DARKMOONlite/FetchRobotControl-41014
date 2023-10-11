@@ -3,7 +3,8 @@
     
     <include>
         <uri>model://Table</uri>
-        <pose>3 0 0 0 0 0</pose>
+        <pose>3 0 -0.5 0 0 0</pose>
+        <static>1</static>
     </include>
     <include>
         <uri>model://coke_can</uri>

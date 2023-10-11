@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="background" pkg="scfms_object_detection" type="background_separator"/>
+    <node name="plane" pkg="scfms_object_detection" type="planar_separator"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find scfms_object_detection)/config/rviz_ransac_config.rviz"></node>
+
+</launch>
