@@ -29,6 +29,10 @@ add_executable(background_separator src/background_separator.cpp)
 target_include_directories(background_separator PUBLIC include)
 target_link_libraries(background_separator ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
+add_executable(cluster_extractor src/cluster_extractor.cpp)
+target_include_directories(cluster_extractor PUBLIC include)
+target_link_libraries(cluster_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
 install(
   DIRECTORY launch config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

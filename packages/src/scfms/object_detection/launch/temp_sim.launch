@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="robot" default="fetch"/>
+
+
+    <include file="$(find scfms_gazebo)/launch/table_world.launch"/>
+    <!-- <include file="$(find fetch_gazebo)/launch/simulation.launch"/> -->
+    
+    <include file="$(find scfms_object_detection)/launch/separator.launch"/>
+    
+
+    <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
+
+</launch>

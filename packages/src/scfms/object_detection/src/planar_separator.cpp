@@ -1,7 +1,5 @@
 
 #include <ros/ros.h>
-
-
 #include <sensor_msgs/PointCloud2.h>
 
 #include <iostream>
@@ -14,6 +12,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <pcl/sample_consensus/sac_model_plane.h>
+
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/filters/extract_indices.h>
 
@@ -163,7 +162,7 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
   
   pcl::CropBox<pcl::PointXYZ> boxfilter;
   boxfilter.setMin(Eigen::Vector4f( -5,0,-5,1));
-  boxfilter.setMax(Eigen::Vector4f( 5,plane_point.y,5,1));
+  boxfilter.setMax(Eigen::Vector4f( 5,plane_point.y-0.01,5,1)); //0.01 border to remove erotius plane points not caught in plane 
   boxfilter.setNegative(true);
 
   boxfilter.setInputCloud(object_points);

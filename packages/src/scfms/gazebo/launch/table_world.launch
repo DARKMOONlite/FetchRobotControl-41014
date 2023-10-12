@@ -5,7 +5,7 @@
 
 
     <arg name="extra_gazebo_args" default="--verbose"/>
-
+    <remap from="gazebo" to="gazebo_table"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find scfms_gazebo)/worlds/table.world"/>
         <arg name="extra_gazebo_args" value="$(arg extra_gazebo_args)"/>

@@ -8,8 +8,49 @@
     </include>
     <include>
         <uri>model://coke_can</uri>
-        <pose>3 0 5 0 0 0 </pose>
+        <pose>3 0 1.5 0 0 0 </pose>
     </include>
+    <include>
+      <uri>model://TennisBall</uri>
+      <pose>3.3 0.1 1 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://strawberry</uri>
+      <pose>2.8 -0.2 1.1 0 0 0</pose>
+    </include>
+
+    <model name="cube">
+      <pose>2.4 -0.35 1 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+          <inertia> <!-- inertias are tricky to compute -->
+            <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
+            <ixx>0.083</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+            <ixy>0.0</ixy>         <!-- for a box: ixy = 0 -->
+            <ixz>0.0</ixz>         <!-- for a box: ixz = 0 -->
+            <iyy>0.083</iyy>       <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+            <iyz>0.0</iyz>         <!-- for a box: iyz = 0 -->
+            <izz>0.083</izz>       <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 0.2</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
     
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
