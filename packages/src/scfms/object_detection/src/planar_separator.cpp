@@ -17,7 +17,7 @@
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/filters/extract_indices.h>
 
-#include <od_helper.hpp>
+#include <scfms_helper.hpp>
 
 
 #include <pcl/filters/crop_box.h>

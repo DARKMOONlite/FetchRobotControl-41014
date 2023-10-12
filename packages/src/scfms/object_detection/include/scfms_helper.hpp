@@ -12,6 +12,8 @@
 
 #include <pcl/filters/filter_indices.h>
 
+#include <pcl/sample_consensus/ransac.h>
+
 sensor_msgs::PointCloud2 extract2ros(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud){
     pcl::PointCloud<pcl::PointXYZ>::Ptr final(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::copyPointCloud(cloud,indicies,*final);
@@ -35,4 +37,35 @@ std::vector<int> getInverseIndicies(std::vector<int>& indicies, pcl::PointCloud<
         }
     }
 return(output);
+}
+
+
+
+template <typename T>
+// pcl::SampleConsensusModel<pcl::PointXYZ>::ConstPtr model,
+std::vector<std::vector<int>> ransacAllModes(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud){
+    pcl::PointCloud<pcl::PointXYZ>::Ptr new_cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    pcl::copyPointCloud(*cloud,*new_cloud);
+
+    boost::shared_ptr<T> model(new T(new_cloud));
+    
+
+    pcl::RandomSampleConsensus<pcl::PointXYZ> ransac(model);
+
+    ransac.setDistanceThreshold(.01);
+
+    std::vector<std::vector<int>> results;
+    std::vector<int> inliers;
+
+    while(new_cloud->size()>0){
+        ransac.computeModel();
+        ransac.getInliers(inliers);
+        if(inliers.size()==0){
+            break;
+        }
+        results.push_back(inliers);
+        for()
+    }
+    return(results);
+
 }
