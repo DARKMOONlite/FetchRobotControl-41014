@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
     <arg name="node_start_delay" default="10"/> <!--? delay launch of these nodes till fetch robot is positioned correctly-->
-    <node name="background" pkg="scfms_object_detection" type="background_separator" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
+    <node name="background" pkg="scfms_object_detection" type="background_separator" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
 
-    <node name="plane" pkg="scfms_object_detection" type="planar_separator" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
+    <node name="plane" pkg="scfms_object_detection" type="planar_separator" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
 
     <node name="cluster" pkg="scfms_object_detection" type="cluster_extractor" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find scfms_object_detection)/config/rviz_ransac_config.rviz"></node>

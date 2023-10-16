@@ -23,7 +23,7 @@
 #include <pcl/filters/passthrough.h>
 
 // #include <pcl/point_cloud.h>
-
+#include <chrono>
 
 ros::Publisher output;
 ros::Publisher output_below;
@@ -144,6 +144,13 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
 
     plane.publish(extract2ros(inliers,*cloud));
 
+  auto time = std::chrono::system_clock::now();
+    auto temp = ransacAllPlanes(cloud);
+
+
+    ROS_INFO("number of planes found [%i]",temp.size());
+  ROS_INFO("time taken to find all planes, %f",std::chrono::duration<double>(std::chrono::system_clock::now()-time).count());
+
 
 // new clouds for removing all objects found below the table plane.
 
@@ -176,6 +183,8 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
   // boxfilter.setNegative(false);
   // std::vector<int> indicies_above_table;
   // boxfilter.filter(indicies_above_table);
+
+
 
     output.publish(extract2ros(indicies_above_table,*object_points));
     
