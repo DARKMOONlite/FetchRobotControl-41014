@@ -1,0 +1,4 @@
+<launch>
+    <node name="movegroup_test" pkg="scfms_moveit" type="movegroup.py" output="screen"/>
+
+  </launch>

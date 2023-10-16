@@ -18,5 +18,13 @@
         "titleBar.inactiveBackground": "#1e2d2f99",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#1e2d2f"
+    "peacock.color": "#1e2d2f",
+    "python.autoComplete.extraPaths": [
+        "/home/sebastian/git/FetchRobotControl-41014/packages/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/sebastian/git/FetchRobotControl-41014/packages/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ]
 }

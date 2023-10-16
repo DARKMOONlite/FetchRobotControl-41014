@@ -36,11 +36,11 @@ trajectory_msgs::JointTrajectory closeGripper(trajectory_msgs::JointTrajectory& 
     return(pose);
 }
 
-void pick(moveit::planning_interface::MoveGroupInterface& move_group){
+void pick(moveit::planning_interface::MoveGroupInterface& move_group,std::string object_name){
     std::vector<moveit_msgs::Grasp> grasps;
     grasps.resize(1); //TODO UPDATE TO MULTIPLE GRASPS
 
-    grasps[0].allowed_touch_objects.push_back("panda_hand_sc");
+    grasps[0].allowed_touch_objects(object_name); //? set allowed touch objects.
 
     // Setting grasp pose
     // ++++++++++++++++++++++

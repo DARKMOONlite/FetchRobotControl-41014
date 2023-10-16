@@ -5,7 +5,15 @@ find_package(catkin)
 catkin_package()
 
 
+install(FILES
+  launch/movegroup.launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
+
+catkin_install_python(PROGRAMS src/movegroup.py
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 
 install(
