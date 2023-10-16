@@ -28,28 +28,42 @@ struct colour{
     }
 };
 
+sensor_msgs::PointCloud2 _2ros(pcl::PointCloud<pcl::PointXYZ> cloud, colour _colour = (colour){255,255,255}){
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr final(new pcl::PointCloud<pcl::PointXYZRGBA>());
+    pcl::copyPointCloud(cloud,*final);
+    ROS_WARN("colour values [%i %i %i]",_colour.r,_colour.g,_colour.b);
+    // for(auto point: *final){
+    //     point.r = _colour.r;
+    //     point.g = _colour.b;
+    //     point.b = _colour.b;
+    //     point.a = 0.5;
+    //     // point.rgb = (static_cast<uint32_t>(_colour.r) << 16 | 
+    //     //             static_cast<uint32_t>(_colour.g) << 8 | 
+    //     //             static_cast<uint32_t>(_colour.b));
 
+    // }
+    int32_t rgb = (static_cast<uint32_t>(_colour.r) << 16 |
+                    static_cast<uint32_t>(_colour.g) << 8 |
+                     static_cast<uint32_t>(_colour.b));
+    for (auto &point : final->points){
+        point.rgb=rgb;
+    }
+    
+    sensor_msgs::PointCloud2 output;
+    pcl::toROSMsg(*final,output);
+
+
+    return(output);
+}
 
 sensor_msgs::PointCloud2 extract2ros(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud,colour _colour = (colour){255,255,255} ){
     pcl::PointCloud<pcl::PointXYZ>::Ptr final(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::copyPointCloud(cloud,indicies,*final);
-    sensor_msgs::PointCloud2 output;
-    pcl::toROSMsg(*final,output);
-    return(output);
+
+    return(_2ros(*final,_colour));
 }
 
-sensor_msgs::PointCloud2 _2ros(pcl::PointCloud<pcl::PointXYZ> cloud, colour _colour = (colour){255,255,255}){
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr final(new pcl::PointCloud<pcl::PointXYZRGB>());
-    pcl::copyPointCloud(cloud,*final);
-    for(auto point: *final){
-        point.rgb = (static_cast<uint32_t>(_colour.r) << 16 | 
-                    static_cast<uint32_t>(_colour.g) << 8 | 
-                    static_cast<uint32_t>(_colour.b));
-    }
-    sensor_msgs::PointCloud2 output;
-    pcl::toROSMsg(*final,output);
-    return(output);
-}
+
 
 
 
@@ -68,7 +82,7 @@ std::vector<int> getInverseIndicies(std::vector<int>& indicies, pcl::PointCloud<
             output.push_back(i);
         }
     }
-return(output);
+    return(output);
 }
 
 

@@ -28,17 +28,20 @@
 #include <pcl/filters/filter_indices.h> // for pcl::removeNaNFromPointCloud
 #include <pcl/segmentation/region_growing.h>
 
-
+#include <pcl/common/distances.h>
 
 // #include <pcl/point_cloud.h>
 #include <chrono>
-
+#include <thread>
 ros::Publisher object_pub;
 ros::Publisher table_pub;
 ros::Publisher plane_pub;
-ros::Publisher segmented_objects , seg_2, seg_3, seg_4;
+ros::Publisher segmented_objects_pub , merged_objects_pub;
 
 using PC = pcl::PointCloud<pcl::PointXYZ> ;
+
+
+static std::vector<colour> colours{{255,102,102},{255,178,102},{204,255,153},{153,255,255},{204,153,255}};
 
 //? taken from the Point cloud library example code http://pointclouds.org/documentation/tutorials/planar_segmentation.html#planar-segmentation
 
@@ -67,7 +70,7 @@ using PC = pcl::PointCloud<pcl::PointXYZ> ;
 
 //   seg.setInputCloud(cloud);
 //   seg.segment (*inliers, *coefficients); // setment the point cloud
-//   ROS_INFO("num inliers [%i], num coefficients [%i]",inliers->indices.size(),coefficients->values.size());
+//   ROS_INFO("num inliers [%zd], num coefficients [%zd]",inliers->indices.size(),coefficients->values.size());
 //   if (inliers->indices.size () == 0)
 //   {
 //     PCL_ERROR ("Could not estimate a planar model for the given dataset.\n");
@@ -89,7 +92,7 @@ using PC = pcl::PointCloud<pcl::PointXYZ> ;
 // }
 
 
-void segmentation_growing(PC::Ptr segmentation_cloud){
+std::vector<PC> segmentation_growing(PC::Ptr segmentation_cloud){
 
   // pcl::copyPointCloud(*object_points, indicies_above_table, *segmentation_cloud);
 
@@ -114,16 +117,82 @@ void segmentation_growing(PC::Ptr segmentation_cloud){
   reg.setInputNormals (normals);
   std::vector <pcl::PointIndices> clusters;
   reg.extract (clusters);
-  ROS_INFO("number of clusters [%i]",clusters.size());
+
+
+  ROS_INFO("number of clusters [%zd]",clusters.size());
   std::stringstream ss;
+
+
+  int i=0;
+    std::vector<pcl::PointCloud<pcl::PointXYZ>> results;
   for(auto cluster : clusters){
+    
     ss <<cluster.indices.size() << ", ";
-    auto msg = extract2ros(cluster.indices,*segmentation_cloud);
-    segmented_objects.publish(msg);
+    auto msg = extract2ros(cluster.indices,*segmentation_cloud,colours.at(i%colours.size()));
+    segmented_objects_pub.publish(msg);
+
+    PC cloud;
+    pcl::copyPointCloud(*segmentation_cloud,cluster.indices,cloud);
+    results.push_back(cloud);
+
+    i++;
   }
   ROS_INFO("size of clusters [%s]",ss.str().c_str());
-  
+
+
+  return(results);
 }
+
+
+
+
+
+std::vector<PC> CombinePC(std::vector<PC> clouds, float max_dist){
+  std::vector<pcl::PointXYZ> averages;
+  for(auto cloud : clouds){
+    averages.push_back(averagePointCloud(cloud));
+  }
+std::vector<int> merge(clouds.size(),-1);
+
+for(int i =0; i < clouds.size();i++){
+  for(int j=i;j<clouds.size();j++){
+    if(i!=j){
+      if(pcl::euclideanDistance<pcl::PointXYZ,pcl::PointXYZ>(averages.at(i),averages.at(j)) < max_dist){ 
+        //only allow merging with 1 thing, not great but may work.
+        merge.at(i)=j;
+        break;
+      }
+    }
+
+
+  }
+}
+std::vector<PC> merging_clouds(clouds.size());
+
+std::vector<bool> not_been_merged(clouds.size(),0);
+for(int i =clouds.size()-1; i>=0 ;i--){
+  if(merge.at(i)==-1){
+    merging_clouds.at(i) = clouds.at(i);
+    not_been_merged.at(i)=true;
+  }
+  else{
+    merging_clouds.at(i) = clouds.at(i);
+    merging_clouds.at(i) += merging_clouds.at(merge.at(i)); //merge the clouds
+    not_been_merged.at(i)=true;
+    not_been_merged.at(merge.at(i))=false;
+    // merge.at(i)=-1; // allow each point cloud to merge once.
+  }
+}
+std::vector<PC> merged_clouds;
+
+for(int i=0;i<clouds.size();i++){
+  if(not_been_merged.at(i)==true){
+    merged_clouds.push_back(merging_clouds.at(i));
+  }
+}
+return(merged_clouds);
+}
+
 
 
 void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
@@ -134,7 +203,7 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   PC::Ptr final(new PC());
 
   pcl::fromROSMsg<pcl::PointXYZ>(*msg, *cloud); // load point cloud from ros msg
-  ROS_INFO("cloud size [%i]", cloud->size());
+  ROS_INFO("cloud size [%zd]", cloud->size());
 
   pcl::SampleConsensusModelPlane<pcl::PointXYZ>::Ptr model_plane(new pcl::SampleConsensusModelPlane<pcl::PointXYZ>(cloud)); // look for a plane
 
@@ -161,8 +230,8 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   //   std::vector<int> outliers;
   //   extract.filter(outliers);
 
-  ROS_INFO("num remaining pts [%i]", inliers.size());
-  ROS_INFO("num removed pts [%i]", outliers.size());
+  ROS_INFO("num remaining pts [%zd]", inliers.size());
+  ROS_INFO("num removed pts [%zd]", outliers.size());
 
   plane_pub.publish(extract2ros(inliers, *cloud));
 
@@ -223,7 +292,28 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
 PC::Ptr obj_above_table_cloud(new PC);
 pcl::copyPointCloud(*object_points,indicies_above_table,*obj_above_table_cloud);
 
-segmentation_growing(obj_above_table_cloud);
+auto vector_clouds = segmentation_growing(obj_above_table_cloud);
+
+
+//? --------------------- Merge clouds based on proximity of centroids --------------------
+
+auto merged_objects = CombinePC(vector_clouds,0.2);
+//sort array, largest to smallest to make colours consistent
+std::sort(merged_objects.begin(),merged_objects.end(),[](PC &a, PC &b){return(a.points.size()>b.points.size());});
+
+ROS_INFO("num merged clouds [%zd]",merged_objects.size());
+
+
+std::stringstream ss;
+int i=0;
+for(auto cloud : merged_objects){
+  i++;
+  ss << cloud.size() << " ,";
+  merged_objects_pub.publish(_2ros(cloud,colours.at(i%colours.size())));
+}
+ROS_INFO("merged sizes [%s]",ss.str().c_str());
+
+ 
 
 }
 
@@ -234,15 +324,14 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "planar");
 
   ros::NodeHandle n;
+  // std::this_thread::sleep_for(std::chrono::seconds(20));
 
   ROS_INFO("waiting for information on topic [/removed_background]");
   object_pub = n.advertise<sensor_msgs::PointCloud2>("/objects", 1000);
   table_pub = n.advertise<sensor_msgs::PointCloud2>("/table_legs", 1000);
   plane_pub = n.advertise<sensor_msgs::PointCloud2>("/plane", 1000);
-  segmented_objects = n.advertise<sensor_msgs::PointCloud2>("/found_planes", 1000);
-  seg_2 = n.advertise<sensor_msgs::PointCloud2>("/seg2", 1000);
-    seg_3 = n.advertise<sensor_msgs::PointCloud2>("/seg3", 1000);
-      seg_4 = n.advertise<sensor_msgs::PointCloud2>("/seg4", 1000);
+  segmented_objects_pub = n.advertise<sensor_msgs::PointCloud2>("/found_objects_segments", 1000);
+  merged_objects_pub = n.advertise<sensor_msgs::PointCloud2>("/merged_object_segments",1000);
   // ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1000,consensusPointCloudCallback);
   ros::Subscriber sub = n.subscribe("/removed_background", 1000, consensusPointCloudCallback);
  
