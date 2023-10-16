@@ -43,37 +43,45 @@ return(output);
 
 
 
-// pcl::SampleConsensusModel<pcl::PointXYZ>::ConstPtr model,
-std::vector<std::vector<int>> ransacAllPlanes( pcl::PointCloud<pcl::PointXYZ>::Ptr cloud){
+// ,
+template <typename T>
+std::vector<std::vector<int>> ransacAllPlanes(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, const int min_model_size = 200, const int search_depth_percentage = 5){
     pcl::PointCloud<pcl::PointXYZ>::Ptr new_cloud(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::copyPointCloud(*cloud,*new_cloud);
 
- 
-    pcl::SampleConsensusModelPlane<pcl::PointXYZ>::Ptr model_plane(new pcl::SampleConsensusModelPlane<pcl::PointXYZ>(new_cloud)); // look for a plane
-
-    pcl::RandomSampleConsensus<pcl::PointXYZ> ransac(model_plane);
-
-    ransac.setDistanceThreshold(.01);
-
     std::vector<std::vector<int>> results;
-   
+    
     pcl::IndicesPtr inliers (new std::vector<int>);
-    // inliersPtr->data = inliers;
 
-    while(new_cloud->size()>0){
+
+
+    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    
+    while(new_cloud->size() > cloud->size()*5/100){
+
+        pcl::SampleConsensusModel<pcl::PointXYZ>::Ptr new_model(new T(new_cloud)); //! find out why the constructor needs to be called each loop instead of just setinputcloud on the changed cloud
+        new_model->setInputCloud(new_cloud);
+
+        pcl::RandomSampleConsensus<pcl::PointXYZ> ransac(new_model);
+        ransac.setDistanceThreshold(.01);
         ransac.computeModel();
         ransac.getInliers(*inliers);
-        if(inliers->size()==0){ // if no models that match are found then exit
+        if(inliers->size() <min_model_size){ // if no models that match are found then exit
             break;
         }
         results.push_back(*inliers);
+        
 
-        pcl::ExtractIndices<pcl::PointXYZ> extract; //extract found indicies from the point cloud 
+         //extract found indicies from the point cloud 
         extract.setInputCloud(new_cloud);
+
+        ROS_INFO("ransac function cloud size [%i]",new_cloud->size());
 
         extract.setIndices(inliers);
         extract.setNegative(true);
         extract.filter(*new_cloud);
+        
+        ROS_INFO("inliers being removed [%i]",inliers->size());
 
 
  

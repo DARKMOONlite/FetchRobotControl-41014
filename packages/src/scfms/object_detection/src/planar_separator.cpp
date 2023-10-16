@@ -145,10 +145,15 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
     plane.publish(extract2ros(inliers,*cloud));
 
   auto time = std::chrono::system_clock::now();
-    auto temp = ransacAllPlanes(cloud);
+    auto temp = ransacAllPlanes<pcl::SampleConsensusModelPlane<pcl::PointXYZ>>(cloud);
 
 
     ROS_INFO("number of planes found [%i]",temp.size());
+    std::stringstream ss;
+    for(auto value : temp){
+      ss <<  value.size() << ", ";
+    }
+    ROS_INFO("number of points in each plane [%s]",ss.str().c_str());
   ROS_INFO("time taken to find all planes, %f",std::chrono::duration<double>(std::chrono::system_clock::now()-time).count());
 
 
