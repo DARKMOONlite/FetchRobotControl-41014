@@ -11,4 +11,5 @@
 
     <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
 
+    <include file="$(find gpd_ros)/launch/ur5.launch"/>    
 </launch>

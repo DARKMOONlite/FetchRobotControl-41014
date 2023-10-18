@@ -8,11 +8,12 @@
     </include>
     <include>
         <uri>model://coke_can</uri>
-        <pose>3 0 1.5 0 0 0 </pose>
+        <pose>3 0 1 0 0 0 </pose>
+        <static>1</static>
     </include>
     <include>
       <uri>model://TennisBall</uri>
-      <pose>3.3 0.1 1 0 0 0</pose>
+      <pose>3.3 0.1 0.7 0 0 0</pose>
     </include>
     <include>
       <uri>model://strawberry</uri>
@@ -20,7 +21,7 @@
     </include>
 
     <model name="cube">
-      <pose>2.4 -0.35 1 0 0 0</pose>
+      <pose>2.4 -0.35 0.9 0 0 0</pose>
       <static>false</static>
       <link name="link">
         <inertial>
@@ -38,14 +39,14 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.2 0.2 0.2</size>
+              <size>0.09 0.09 0.09</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.2 0.2 0.2</size>
+              <size>0.09 0.09 0.09</size>
             </box>
           </geometry>
         </visual>

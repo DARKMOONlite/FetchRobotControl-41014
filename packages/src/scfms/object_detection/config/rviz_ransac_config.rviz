@@ -11,6 +11,7 @@ Panels:
         - /PointCloud23
         - /PointCloud24
         - /PointCloud25
+        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -197,6 +198,14 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /detect_grasps/plot_grasps
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -225,16 +234,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.2864258885383606
+      Distance: 0.33720827102661133
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.590699553489685
-        Y: 0.41933709383010864
-        Z: 1.414825677871704
+        X: 1.5588582754135132
+        Y: 0.4068151116371155
+        Z: 1.3850984573364258
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -262,4 +271,4 @@ Window Geometry:
     collapsed: true
   Width: 1267
   X: 629
-  Y: 81
+  Y: 51
