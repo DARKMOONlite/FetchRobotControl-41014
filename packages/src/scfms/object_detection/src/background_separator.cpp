@@ -51,14 +51,14 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
     boxfilter.filter(indicies); // run the filter and get the output indicies that are within that box
 
 
-    output.publish(pclindex2roscloud(indicies,*cloud)); //publish those indicies
+    output.publish(pcl2roscloud(indicies,*cloud)); //publish those indicies
 
 
     std::vector<int> removed;
     boxfilter.setNegative(true); //run the inverse of the filter to get everything outside the box for visualisation
     boxfilter.filter(removed);
 
-    box_removed.publish(pclindex2roscloud(removed,*cloud)); 
+    box_removed.publish(pcl2roscloud(removed,*cloud)); 
 
 
     ROS_INFO("num remaining pts [%i]",indicies.size());

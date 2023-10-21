@@ -69,7 +69,7 @@ sensor_msgs::PointCloud2 pcl2roscloud(pcl::PointCloud<pcl::PointXYZ> cloud, colo
     return(output);
 }
 
-sensor_msgs::PointCloud2 pclindex2roscloud(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud,colour _colour = (colour){255,255,255} ){
+sensor_msgs::PointCloud2 pcl2roscloud(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud,colour _colour = (colour){255,255,255} ){
     pcl::PointCloud<pcl::PointXYZ>::Ptr final(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::copyPointCloud(cloud,indicies,*final);
 
@@ -212,13 +212,33 @@ std::vector<int> reframeIndicies(pcl::PointCloud<pcl::PointXYZ>::Ptr indexed_clo
     
     
 }
-
-gpd_ros::CloudIndexed PointCloud2GPDCloud(std::vector<int> indicies,pcl::PointCloud<pcl::PointXYZ>::Ptr cloud ){
+/**
+ * @brief IDK doesn't work as intended, grabs the table legs which is not what i want.
+ * 
+ * @param indicies 
+ * @param cloud 
+ * @return gpd_ros::CloudIndexed 
+ */
+gpd_ros::CloudIndexed PointCloud2GPDIndexCloud(std::vector<int> indicies,pcl::PointCloud<pcl::PointXYZ>::Ptr cloud ){
 gpd_ros::CloudIndexed output;
+for(auto index : indicies){
+    std_msgs::Int64 val;
+    val.data = index;
+    output.indices.push_back(val);
+}
+output.cloud_sources.cloud =pcl2roscloud(*cloud);
+    std_msgs::Int64 camera_source;
+    camera_source.data=0;
+    geometry_msgs::Point view_point;
+    view_point.x=0;
+    view_point.y=0;
+    view_point.z=0;
+for(auto point : *cloud){
 
+output.cloud_sources.camera_source.push_back(camera_source);
 
-// output.indices = indicies;
-// output.cloud_sources.cloud =pcl2roscloud(cloud);
+}
+output.cloud_sources.view_points.push_back(view_point);
 
 return(output);
 }

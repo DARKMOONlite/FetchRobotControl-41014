@@ -11,5 +11,5 @@
 
     <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
 
-    <include file="$(find scfms_object_detection)/launch/gpd_fetch.launch"/>    
+    <!-- <include file="$(find scfms_object_detection)/launch/gpd_fetch.launch"/>     -->
 </launch>

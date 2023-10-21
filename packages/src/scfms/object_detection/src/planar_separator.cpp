@@ -130,7 +130,7 @@ std::vector<PC> segmentation_growing(PC::Ptr segmentation_cloud){
   for(auto cluster : clusters){
     
     ss <<cluster.indices.size() << ", ";
-    auto msg = pclindex2roscloud(cluster.indices,*segmentation_cloud,colours.at(i%colours.size()));
+    auto msg = pcl2roscloud(cluster.indices,*segmentation_cloud,colours.at(i%colours.size()));
     segmented_objects_pub.publish(msg);
 
     PC cloud;
@@ -235,7 +235,7 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   ROS_INFO("num remaining pts [%zd]", inliers.size());
   ROS_INFO("num removed pts [%zd]", outliers.size());
 
-  plane_pub.publish(pclindex2roscloud(inliers, *cloud));
+  plane_pub.publish(pcl2roscloud(inliers, *cloud));
 
   //? ------------------- split objects above and below table -------------------------------------
 
@@ -258,12 +258,12 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   std::vector<int> indicies_below_table;
   boxfilter.filter(indicies_below_table);
 
-  table_pub.publish(pclindex2roscloud(indicies_below_table, *object_points));
+  table_pub.publish(pcl2roscloud(indicies_below_table, *object_points));
 
   auto indicies_above_table = getInverseIndicies(indicies_below_table, *object_points);
 
 
-  object_pub.publish(pclindex2roscloud(indicies_above_table, *object_points));
+  object_pub.publish(pcl2roscloud(indicies_above_table, *object_points));
 
 
 
@@ -311,7 +311,7 @@ int i=0;
 for(auto merged_clouds : merged_objects){
   i++;
   ss << merged_clouds.size() << " ,";
-  merged_objects_pub.publish(pcl2roscloud(merged_clouds,colours.at(i%colours.size())));
+  // merged_objects_pub.publish(pcl2roscloud(merged_clouds,colours.at(i%colours.size())));
 }
 ROS_INFO("merged sizes [%s]",ss.str().c_str());
 
@@ -320,10 +320,13 @@ ROS_INFO("merged sizes [%s]",ss.str().c_str());
 
 for(auto merged_clouds : merged_objects){
   std::shared_ptr<PC> cloud_shared_ptr=  std::make_shared<PC>(merged_clouds);
-  auto reframed_merged_indicies = reframeIndicies(cloud_shared_ptr,cloud);
-  auto gpd_msg = PointCloud2GPDCloud(reframed_merged_indicies,cloud);
+  std::vector<int> reframed_merged_indicies = reframeIndicies(cloud_shared_ptr,cloud);
+  auto gpd_msg = PointCloud2GPDIndexCloud(reframed_merged_indicies,cloud);
   gpd_pub.publish(gpd_msg);
+
+  merged_objects_pub.publish(pcl2roscloud(reframed_merged_indicies,*cloud));
 }
+
 
 
 

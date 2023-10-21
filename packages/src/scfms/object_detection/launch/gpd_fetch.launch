@@ -6,10 +6,14 @@
       <param name="use_importance_sampling" value="false" />
   -->
   
-      <!-- What type of point cloud is used and what ROS topic it comes from -->
-      <param name="cloud_type" value="0" /> <!-- 0: PointCloud2, 1: CloudIndexed, 2: CloudSamples -->
-      <param name="cloud_topic" value="scfms_objects/merged" />
-  
+      <!-- What type of point cloud is used and what ROS topic it comes from 0: PointCloud2, 1: CloudIndexed, 2: CloudSamples -->
+      <param name="cloud_type" value="0" /> 
+      <param name="cloud_topic" value="/scfms_objects/merged" />
+      
+        <!-- <param name="cloud_type" value="1" />
+        <param name="cloud_topic" value="/scfms_objects/gpd_indexed"/> -->
+
+
       <!-- (optional) The ROS topic that the samples come from (default: an empty string) -->
       <param name="samples_topic" value="" />
   
