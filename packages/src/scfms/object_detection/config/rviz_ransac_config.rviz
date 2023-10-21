@@ -12,6 +12,7 @@ Panels:
         - /PointCloud24
         - /PointCloud25
         - /MarkerArray1
+        - /MarkerArray2
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -81,7 +82,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /objects
+      Topic: /scfms_scene/objects
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -109,7 +110,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /background
+      Topic: /scfms_scene/background
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -137,7 +138,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /plane
+      Topic: /scfms_scene/plane
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -165,7 +166,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Flat Squares
-      Topic: /table_legs
+      Topic: /scfms_scene/table_legs
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -193,7 +194,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.019999999552965164
       Style: Flat Squares
-      Topic: /merged_object_segments
+      Topic: /scfms_objects/merged
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -201,6 +202,14 @@ Visualization Manager:
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /detect_grasps/plot_grasps
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /individual_grasps
       Name: MarkerArray
       Namespaces:
         {}
@@ -271,4 +280,4 @@ Window Geometry:
     collapsed: true
   Width: 1267
   X: 629
-  Y: 51
+  Y: 27

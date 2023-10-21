@@ -109,7 +109,7 @@ void clusterExtractionCallback(const sensor_msgs::PointCloud2ConstPtr & _msg){
 //     cloud_cluster->height = 1;
 //     cloud_cluster->is_dense = true;
 
-//     clusters.publish(extract2ros(cluster.indices,*cloud_filtered));
+//     clusters.publish(pclindex2roscloud(cluster.indices,*cloud_filtered));
 //     // std::cout << "PointCloud representing the Cluster: " << cloud_cluster->size () << " data points." << std::endl;
 //     // std::stringstream ss;
 //     // ss << std::setw(4) << std::setfill('0') << j;

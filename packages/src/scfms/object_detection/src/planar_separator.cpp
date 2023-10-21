@@ -37,8 +37,10 @@ ros::Publisher object_pub;
 ros::Publisher table_pub;
 ros::Publisher plane_pub;
 ros::Publisher segmented_objects_pub , merged_objects_pub;
-
+ros::Publisher gpd_pub;
 using PC = pcl::PointCloud<pcl::PointXYZ> ;
+
+
 
 
 static std::vector<colour> colours{{255,102,102},{255,178,102},{204,255,153},{153,255,255},{204,153,255}};
@@ -128,7 +130,7 @@ std::vector<PC> segmentation_growing(PC::Ptr segmentation_cloud){
   for(auto cluster : clusters){
     
     ss <<cluster.indices.size() << ", ";
-    auto msg = extract2ros(cluster.indices,*segmentation_cloud,colours.at(i%colours.size()));
+    auto msg = pclindex2roscloud(cluster.indices,*segmentation_cloud,colours.at(i%colours.size()));
     segmented_objects_pub.publish(msg);
 
     PC cloud;
@@ -233,7 +235,7 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   ROS_INFO("num remaining pts [%zd]", inliers.size());
   ROS_INFO("num removed pts [%zd]", outliers.size());
 
-  plane_pub.publish(extract2ros(inliers, *cloud));
+  plane_pub.publish(pclindex2roscloud(inliers, *cloud));
 
   //? ------------------- split objects above and below table -------------------------------------
 
@@ -256,12 +258,12 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr &msg)
   std::vector<int> indicies_below_table;
   boxfilter.filter(indicies_below_table);
 
-  table_pub.publish(extract2ros(indicies_below_table, *object_points));
+  table_pub.publish(pclindex2roscloud(indicies_below_table, *object_points));
 
   auto indicies_above_table = getInverseIndicies(indicies_below_table, *object_points);
 
 
-  object_pub.publish(extract2ros(indicies_above_table, *object_points));
+  object_pub.publish(pclindex2roscloud(indicies_above_table, *object_points));
 
 
 
@@ -306,14 +308,26 @@ ROS_INFO("num merged clouds [%zd]",merged_objects.size());
 
 std::stringstream ss;
 int i=0;
-for(auto cloud : merged_objects){
+for(auto merged_clouds : merged_objects){
   i++;
-  ss << cloud.size() << " ,";
-  merged_objects_pub.publish(_2ros(cloud,colours.at(i%colours.size())));
+  ss << merged_clouds.size() << " ,";
+  merged_objects_pub.publish(pcl2roscloud(merged_clouds,colours.at(i%colours.size())));
 }
 ROS_INFO("merged sizes [%s]",ss.str().c_str());
 
  
+//? --------------------- Convert to Index Cloud Msg for more effective GPD use;
+
+for(auto merged_clouds : merged_objects){
+  std::shared_ptr<PC> cloud_shared_ptr=  std::make_shared<PC>(merged_clouds);
+  auto reframed_merged_indicies = reframeIndicies(cloud_shared_ptr,cloud);
+  auto gpd_msg = PointCloud2GPDCloud(reframed_merged_indicies,cloud);
+  gpd_pub.publish(gpd_msg);
+}
+
+
+
+
 
 }
 
@@ -321,19 +335,20 @@ ROS_INFO("merged sizes [%s]",ss.str().c_str());
 int main(int argc, char **argv)
 {
 
-  ros::init(argc, argv, "planar");
+  ros::init(argc, argv, "scfms/planar_separator");
 
   ros::NodeHandle n;
   // std::this_thread::sleep_for(std::chrono::seconds(20));
 
-  ROS_INFO("waiting for information on topic [/removed_background]");
-  object_pub = n.advertise<sensor_msgs::PointCloud2>("/objects", 1000);
-  table_pub = n.advertise<sensor_msgs::PointCloud2>("/table_legs", 1000);
-  plane_pub = n.advertise<sensor_msgs::PointCloud2>("/plane", 1000);
-  segmented_objects_pub = n.advertise<sensor_msgs::PointCloud2>("/found_objects_segments", 1000);
-  merged_objects_pub = n.advertise<sensor_msgs::PointCloud2>("/merged_object_segments",1000);
+  // ROS_INFO("waiting for information on topic [/removed_background]");
+  object_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/objects", 1000);
+  table_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/table_legs", 1000);
+  plane_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/plane", 1000);
+  segmented_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/segments", 1000);
+  merged_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/merged",1000);
+  gpd_pub = n.advertise<gpd_ros::CloudIndexed>(NS_OBJECTS+"/gpd_indexed",1000);
   // ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1000,consensusPointCloudCallback);
-  ros::Subscriber sub = n.subscribe("/removed_background", 1000, consensusPointCloudCallback);
+  ros::Subscriber sub = n.subscribe(NS_SCENE+"/inv_background", 1000, consensusPointCloudCallback);
  
   ros::spin();
 

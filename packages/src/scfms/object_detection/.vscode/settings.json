@@ -73,5 +73,7 @@
         "random": "cpp",
         "set": "cpp",
         "string": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true,
+    "C_Cpp.errorSquiggles": "enabled"
 }

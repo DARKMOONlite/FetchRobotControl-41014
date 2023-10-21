@@ -51,14 +51,14 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
     boxfilter.filter(indicies); // run the filter and get the output indicies that are within that box
 
 
-    output.publish(extract2ros(indicies,*cloud)); //publish those indicies
+    output.publish(pclindex2roscloud(indicies,*cloud)); //publish those indicies
 
 
     std::vector<int> removed;
     boxfilter.setNegative(true); //run the inverse of the filter to get everything outside the box for visualisation
     boxfilter.filter(removed);
 
-    box_removed.publish(extract2ros(removed,*cloud)); 
+    box_removed.publish(pclindex2roscloud(removed,*cloud)); 
 
 
     ROS_INFO("num remaining pts [%i]",indicies.size());
@@ -73,13 +73,13 @@ int main(int argc, char ** argv){
 
 
 
-    ros::init(argc,argv,"background");
+    ros::init(argc,argv,"/scfms/background_separator");
 
     ros::NodeHandle n;
 
     ROS_INFO("waiting for information on topic [/head_camera/depth_registered/points]");
-    output = n.advertise<sensor_msgs::PointCloud2>("/removed_background",1000);
-    box_removed = n.advertise<sensor_msgs::PointCloud2>("/background",1000);
+    output = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/inv_background",1000);
+    box_removed = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/background",1000);
 
     
 

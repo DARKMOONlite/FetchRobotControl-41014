@@ -16,6 +16,10 @@
 #include <pcl/sample_consensus/ransac.h>
 #include <pcl/filters/extract_indices.h>
 #include <cstdint>
+#include <optional>
+#include <pcl/search/kdtree.h>
+#include <gpd_ros/CloudIndexed.h>
+
 struct colour{
     uint8_t r=255;
     uint8_t g=255;
@@ -28,7 +32,16 @@ struct colour{
     }
 };
 
-sensor_msgs::PointCloud2 _2ros(pcl::PointCloud<pcl::PointXYZ> cloud, colour _colour = (colour){255,255,255}){
+
+/**
+ * @brief namespaces for publishing and subscribing
+ * 
+ */
+const std::string NS_SCENE = "/scfms_scene", NS_OBJECTS = "/scfms_objects";
+
+
+
+sensor_msgs::PointCloud2 pcl2roscloud(pcl::PointCloud<pcl::PointXYZ> cloud, colour _colour = (colour){255,255,255}){
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr final(new pcl::PointCloud<pcl::PointXYZRGBA>());
     pcl::copyPointCloud(cloud,*final);
     ROS_WARN("colour values [%i %i %i]",_colour.r,_colour.g,_colour.b);
@@ -56,11 +69,11 @@ sensor_msgs::PointCloud2 _2ros(pcl::PointCloud<pcl::PointXYZ> cloud, colour _col
     return(output);
 }
 
-sensor_msgs::PointCloud2 extract2ros(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud,colour _colour = (colour){255,255,255} ){
+sensor_msgs::PointCloud2 pclindex2roscloud(std::vector<int> indicies, pcl::PointCloud<pcl::PointXYZ> cloud,colour _colour = (colour){255,255,255} ){
     pcl::PointCloud<pcl::PointXYZ>::Ptr final(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::copyPointCloud(cloud,indicies,*final);
 
-    return(_2ros(*final,_colour));
+    return(pcl2roscloud(*final,_colour));
 }
 
 
@@ -158,3 +171,56 @@ pcl::PointXYZ averagePointCloud(pcl::PointCloud<pcl::PointXYZ> cloud){
  return(output);
 
 }
+/**
+ * @brief finds the points represented by the index extracted from the indexed_cloud in the total cloud;
+ * 
+ * @param indexed_cloud 
+ * @param total_cloud 
+ * @return std::vector<int> returns the inputed indicies but in the frame of @param total_cloud
+ */
+std::vector<int> reframeIndicies(pcl::PointCloud<pcl::PointXYZ>::Ptr indexed_cloud,pcl::PointCloud<pcl::PointXYZ>::Ptr total_cloud, std::optional<std::vector<int>> index = std::nullopt,double max_warn_dist = 0.5){
+    pcl::KdTreeFLANN<pcl::PointXYZ> kdt;
+    std::vector<int> new_index;
+    kdt.setInputCloud(total_cloud);
+    if(index){
+        for(auto point : *index){
+            std::vector<int> output_index;
+            std::vector<float> pose_delta;
+            kdt.nearestKSearch(indexed_cloud->at(point),1,output_index,pose_delta);
+            new_index.push_back(output_index.front());
+            if(pose_delta.front()>max_warn_dist){
+               ROS_INFO("when reframing indicies, 1 point was found to be > %f away from its expected point",pose_delta.front());
+            } 
+        }
+    }
+    else{
+        for(auto point : indexed_cloud->points){
+            std::vector<int> output_index;
+            std::vector<float> pose_delta;
+            kdt.nearestKSearch(point,1,output_index,pose_delta);
+            new_index.push_back(output_index.front());
+            if(pose_delta.front()>max_warn_dist){
+               ROS_INFO("when reframing indicies, 1 point was found to be > %f away from its expected point",pose_delta.front());
+            } 
+
+    }
+    }
+
+
+    return(new_index);
+
+    
+    
+}
+
+gpd_ros::CloudIndexed PointCloud2GPDCloud(std::vector<int> indicies,pcl::PointCloud<pcl::PointXYZ>::Ptr cloud ){
+gpd_ros::CloudIndexed output;
+
+
+// output.indices = indicies;
+// output.cloud_sources.cloud =pcl2roscloud(cloud);
+
+return(output);
+}
+
+
