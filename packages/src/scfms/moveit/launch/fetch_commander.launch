@@ -1,0 +1,10 @@
+<!-- FILEPATH: /path/to/your/launch/file.launch -->
+
+<launch>
+    <!-- Nodes -->
+    <node pkg="scfms_moveit" type="fetch_commander.py" name="fetch_commander" output="screen">
+        <!-- Arguments -->
+        <!-- <param name="param_name" value="param_value"/> -->
+    </node>
+
+</launch>

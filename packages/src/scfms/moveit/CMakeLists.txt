@@ -160,6 +160,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   scripts/moveit_test.py
+  scripts/fetch_commander.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -178,6 +179,8 @@ catkin_install_python(PROGRAMS
 # )
 install(PROGRAMS
   scripts/moveit_test.py
+  scripts/fetch_commander.py
+  src/movegroup.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 install(DIRECTORY

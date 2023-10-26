@@ -22,6 +22,8 @@ from moveit_commander.conversions import pose_to_list
     group_name = "arm"
 
     move_group = moveit_commander.MoveGroupCommander(group_name)
+    joints  = move_group.get_joints();
+    rospy.loginfo("Joint names: {}".format(joints));
 
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
