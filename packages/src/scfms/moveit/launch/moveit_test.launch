@@ -1,0 +1,6 @@
+<!-- FILEPATH: /home/sebastian/git/FetchRobotControl-41014/packages/src/scfms/moveit/launch/moveit_test.launch -->
+
+<launch>
+    <!-- Add the following node tag to launch the moveit_test.py script -->
+    <node name="moveit_test_node" pkg="scfms_moveit" type="moveit_test.py" output="screen"/>
+</launch>

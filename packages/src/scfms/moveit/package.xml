@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>scfms_moveit</name>
+    <version>0.0.0</version>
+    <description>The scfms_moveit package</description>
+
+    <maintainer email="sebastianschroder@hotmail.com">Sebastian Schroder</maintainer>
+
+    <license>MIT</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <build_depend>moveit_core</build_depend>
+    <build_depend>moveit_ros_planning_interface</build_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>moveit_core</exec_depend>
+    <exec_depend>moveit_ros_planning_interface</exec_depend>
+
+</package>
