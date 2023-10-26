@@ -277,8 +277,8 @@ if __name__ == "__main__":
 
     pose_goal = Pose()
     pose_goal.orientation.w = 1.0
-    pose_goal.position.x = current_pose.pose.position.x-0.2
-    pose_goal.position.y = current_pose.pose.position.y-0.1
+    pose_goal.position.x = current_pose.pose.position.x+0.2
+    pose_goal.position.y = current_pose.pose.position.y+0.1
     pose_goal.position.z = current_pose.pose.position.z-0.3
     move_group.set_pose_target(pose_goal)
     rospy.loginfo("Moving arm...")
