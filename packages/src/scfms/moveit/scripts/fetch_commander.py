@@ -99,24 +99,24 @@ class FollowTrajectoryClient(object):
         self.client.send_goal(follow_goal)
         self.client.wait_for_result()
 
-# # Point the head using controller
-# class PointHeadClient(object):
+# Point the head using controller
+class PointHeadClient(object):
 
-#     def __init__(self):
-#         self.client = actionlib.SimpleActionClient("head_controller/point_head", PointHeadAction)
-#         rospy.loginfo("Waiting for head_controller...")
-#         self.client.wait_for_server()
+    def __init__(self):
+        self.client = actionlib.SimpleActionClient("head_controller/point_head", PointHeadAction)
+        rospy.loginfo("Waiting for head_controller...")
+        self.client.wait_for_server()
 
-#     def look_at(self, x, y, z, frame, duration=1.0):
-#         goal = PointHeadGoal()
-#         goal.target.header.stamp = rospy.Time.now()
-#         goal.target.header.frame_id = frame
-#         goal.target.point.x = x
-#         goal.target.point.y = y
-#         goal.target.point.z = z
-#         goal.min_duration = rospy.Duration(duration)
-#         self.client.send_goal(goal)
-#         self.client.wait_for_result()
+    def look_at(self, x, y, z, frame, duration=1.0):
+        goal = PointHeadGoal()
+        goal.target.header.stamp = rospy.Time.now()
+        goal.target.header.frame_id = frame
+        goal.target.point.x = x
+        goal.target.point.y = y
+        goal.target.point.z = z
+        goal.min_duration = rospy.Duration(duration)
+        self.client.send_goal(goal)
+        self.client.wait_for_result()
 
 # # Tools for grasping
 # class GraspingClient(object):
@@ -261,28 +261,44 @@ if __name__ == "__main__":
     # Setup clients
     move_base = MoveBaseClient()
     torso_action = FollowTrajectoryClient("torso_controller", ["torso_lift_joint"])
+
+
+
     # arm_action = FollowTrajectoryClient("arm_controller",arm_joints)
-    # head_action = PointHeadClient()
+
+    head_action = PointHeadClient()
+    rospy.loginfo("looking at the table...")
+    head_action.look_at(1.0, 0.0, 0.5, "base_link")
+
     # grasping_client = GraspingClient()
 
 
 
-    rospy.loginfo("Raising torso...")
-    torso_action.move_to([0.4])
+    # rospy.loginfo("Raising torso...")
+    # torso_action.move_to([0.4])
 
 
     current_pose = move_group.get_current_pose()
-    
+    current_pose.
     rospy.loginfo("Current pose: x: {} y: {} z: {}".format(current_pose.pose.position.x,current_pose.pose.position.y,current_pose.pose.position.z))
 
     pose_goal = Pose()
     pose_goal.orientation.w = 1.0
     pose_goal.position.x = current_pose.pose.position.x+0.2
     pose_goal.position.y = current_pose.pose.position.y+0.1
-    pose_goal.position.z = current_pose.pose.position.z-0.3
+    pose_goal.position.z = current_pose.pose.position.z+0.1
     move_group.set_pose_target(pose_goal)
+    rospy.loginfo("Planning trajectory...")
+    plan = move_group.plan();
+
+    if(len(plan.joint_trajectory.points) == 0):
+        rospy.loginfo("No plan found")
+        exit(0)
+
     rospy.loginfo("Moving arm...")
-    success = move_group.go(wait=True)
+
+    success = move_group.execute(plan,wait=True)
+
     move_group.stop()
     move_group.clear_pose_targets()
 
