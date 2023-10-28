@@ -1,0 +1,35 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/sebastian/git/FetchRobotControl-41014/packages/devel/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/deep_grasp_demo/deep_grasp_task/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/src/fetch_ros/fetch_depth_layer/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/src/fetch_gazebo/fetch_gazebo/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/fetch_robot_simulation/src/fetch_ros/fetch_ikfast_plugin/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/gpd_ros/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/moveit_grasps/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/moveit_task_constructor/core/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/moveit_task_constructor/demo/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/deep_grasp_demo/moveit_task_constructor_dexnet/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/deep_grasp_demo/moveit_task_constructor_gpd/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/moveit_task_constructor/rviz_marker_tools/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/dependency-packages/rviz_visual_tools/include/**",
+        "/home/sebastian/git/FetchRobotControl-41014/packages/src/scfms/object_detection/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

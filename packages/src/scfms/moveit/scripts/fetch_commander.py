@@ -268,7 +268,7 @@ if __name__ == "__main__":
 
     head_action = PointHeadClient()
     rospy.loginfo("looking at the table...")
-    head_action.look_at(1.0, 0.0, 0.5, "base_link")
+    head_action.look_at(1.0, 0.0, 1, "base_link")
 
     # grasping_client = GraspingClient()
 
@@ -279,7 +279,7 @@ if __name__ == "__main__":
 
 
     current_pose = move_group.get_current_pose()
-    current_pose.
+
     rospy.loginfo("Current pose: x: {} y: {} z: {}".format(current_pose.pose.position.x,current_pose.pose.position.y,current_pose.pose.position.z))
 
     pose_goal = Pose()

@@ -19,3 +19,8 @@ in another terminal then write to launch the script:
 ```bash
 roslauch scmfs_moveit fetch_commander.py
 ```
+
+to mvvoe the fetch robot to the correct position, download the `ros-melodic-teleop-twist-keyboard` and run in another terminal
+```bash
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py 
+```
