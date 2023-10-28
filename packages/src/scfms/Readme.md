@@ -17,5 +17,5 @@ roslaunch scfms_moveit demo.launch
 
 in another terminal then write to launch the script:
 ```bash
-roslauch scmfs_moveit fetch_commander.py
+roslauch scfms_moveit fetch_commander.launch
 ```
