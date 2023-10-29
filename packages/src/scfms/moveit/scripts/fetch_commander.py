@@ -46,8 +46,10 @@ from geometry_msgs.msg import PoseStamped, Pose
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes, Grasp
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-
+from visualization_msgs.msg import MarkerArray
 from gpd_ros.msg import GraspConfigList
+
+import tf2_ros, tf2_geometry_msgs
 
 # Move base using navigation stack
 class MoveBaseClient(object):
@@ -281,9 +283,9 @@ def grasp_callback(data):
         rotation = np.array([[grasp.approach.x,grasp.binormal.x,grasp.axis.x],[grasp.approach.y,grasp.binormal.y,grasp.axis.y],[grasp.approach.z,grasp.binormal.z,grasp.axis.z]])
         rotate_around_y = np.array([[0,0,1],[0,1,0],[-1,0,0]])
         rotate_around_z = np.array([[0,-1,0],[1,0,0],[0,0,1]])
-        rotation_adjusted = np.matmul(np.matmul(rotation,rotate_around_y),rotate_around_z)
+        rotation_adjusted = np.matmul(np.matmul(rotate_around_y,rotate_around_z),rotation)
         # rotation*rotate_around_y*rotate_around_z
-        quaternion = quaternions.mat2quat(rotation_adjusted)
+        quaternion = quaternions.mat2quat(rotation)
         rospy.loginfo("matrix2 :{}".format(np.matmul(rotation,rotate_around_y)))
         rospy.loginfo("matrix3 : {}".format(rotation_adjusted))
         # rospy.loginfo("matrix2: {}".format(Rotation.fr))
@@ -301,20 +303,71 @@ def grasp_callback(data):
         ee_pose.header.frame_id= "head_camera_depth_optical_frame"
         ee_pose.header.stamp = rospy.Time.now()
         ee_pose.header.seq = grasp_callback.counter
-        # move_group.set_pose_target(ee_pose)
+        # 
 
-        # move_group.go(wait=True)
+        # 
     
         grasp_pub.publish(ee_pose)
 grasp_callback.counter=0
 
+
+def visualisation_callback(data):
+    if len(data.markers) < 1:
+        return
+
+    rospy.loginfo("Number of grasps received: {}".format(len(data.markers)))
     
+    grasp = data.markers[2]
+
+
+    ee_pose = PoseStamped();
+    ee_pose.pose = grasp.pose
+    ee_pose.pose.position.z 
+
+    ee_pose.header.frame_id= "head_camera_depth_optical_frame"
+    ee_pose.header.stamp = rospy.Time.now()
+    ee_pose.header.seq = visualisation_callback.counter
+    from pyquaternion import Quaternion
+
+    q = Quaternion(ee_pose.pose.orientation.w,ee_pose.pose.orientation.x,ee_pose.pose.orientation.y,ee_pose.pose.orientation.z)
+    v = np.array([0,-0.015,0])
+    v_rotated = q.rotate(v)
+    ee_pose.pose.position.x += v_rotated[0]
+    ee_pose.pose.position.y += v_rotated[1] 
+    ee_pose.pose.position.z += v_rotated[2]
+    grasp_pub.publish(ee_pose)
+    visualisation_callback.counter += 1
+
+
+    tf_buffer = tf2_ros.Buffer(rospy.Duration(100))
+    tf_listener = tf2_ros.TransformListener(tf_buffer)
+    tranform = tf_buffer.lookup_transform("base_link",ee_pose.header.frame_id,rospy.Time(0),rospy.Duration(1.0))
+    pose_transformed = tf2_geometry_msgs.do_transform_pose(ee_pose,tranform)
+
+    temp_grasp_pub.publish(pose_transformed)
+
+
+    move_group.set_pose_target(pose_transformed)
+    plan = move_group.plan();
+    if(len(plan.joint_trajectory.points) == 0):
+        rospy.loginfo("No plan found")
+        return
+
+    rospy.loginfo("Moving arm...")
+
+    success = move_group.execute(plan,wait=True)
+    move_group.stop()
+    move_group.clear_pose_targets()
+
+
+visualisation_callback.counter=0
 
 
 
 if __name__ == "__main__":
     global grasp_pub
     global move_group
+    global temp_grasp_pub
     # Create a node
     rospy.init_node("demo")
 
@@ -324,10 +377,11 @@ if __name__ == "__main__":
 
 
 
-    rospy.Subscriber("/detect_grasps/clustered_grasps",GraspConfigList,grasp_callback)
-    
+    # rospy.Subscriber("/detect_grasps/clustered_grasps",GraspConfigList,grasp_callback)
+    rospy.Subscriber("/detect_grasps/plot_grasps",MarkerArray,visualisation_callback)
     grasp_pub = rospy.Publisher("/scfms/grasp_pose",PoseStamped,queue_size=20)
 
+    temp_grasp_pub = rospy.Publisher("scfms/temp_pose",PoseStamped,queue_size=20)
     
     move_group = moveit_commander.MoveGroupCommander("arm")
     arm_joints  = move_group.get_joints();
