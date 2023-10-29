@@ -339,9 +339,9 @@ def visualisation_callback(data):
     visualisation_callback.counter += 1
 
 
-    tf_buffer = tf2_ros.Buffer(rospy.Duration(100))
+    tf_buffer = tf2_ros.Buffer(rospy.Duration(10))
     tf_listener = tf2_ros.TransformListener(tf_buffer)
-    tranform = tf_buffer.lookup_transform("base_link",ee_pose.header.frame_id,rospy.Time(0),rospy.Duration(1.0))
+    tranform = tf_buffer.lookup_transform("map",ee_pose.header.frame_id,rospy.Time(0),rospy.Duration(1.0))
     pose_transformed = tf2_geometry_msgs.do_transform_pose(ee_pose,tranform)
 
     temp_grasp_pub.publish(pose_transformed)
@@ -401,7 +401,7 @@ if __name__ == "__main__":
     head_action.look_at(1.0, 0.0, 1, "base_link")
 
     # grasping_client = GraspingClient()
-    arm_action.move_to([0.0, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
+    arm_action.move_to([1.571, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
 
 
     # rospy.loginfo("Raising torso...")
