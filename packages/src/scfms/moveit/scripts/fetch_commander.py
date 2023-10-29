@@ -387,20 +387,21 @@ if __name__ == "__main__":
     arm_joints  = move_group.get_joints();
     rospy.loginfo("Joint names: {}".format(arm_joints));
 
+
     # Setup clients
     move_base = MoveBaseClient()
     torso_action = FollowTrajectoryClient("torso_controller", ["torso_lift_joint"])
 
 
 
-    # arm_action = FollowTrajectoryClient("arm_controller",arm_joints)
+    arm_action = FollowTrajectoryClient("arm_controller",arm_joints)
 
     head_action = PointHeadClient()
     rospy.loginfo("looking at the table...")
     head_action.look_at(1.0, 0.0, 1, "base_link")
 
     # grasping_client = GraspingClient()
-
+    arm_action.move_to([0.0, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
 
 
     # rospy.loginfo("Raising torso...")
@@ -411,25 +412,25 @@ if __name__ == "__main__":
 
     rospy.loginfo("Current pose: x: {} y: {} z: {}".format(current_pose.pose.position.x,current_pose.pose.position.y,current_pose.pose.position.z))
 
-    pose_goal = Pose()
-    pose_goal.orientation.w = 1.0
-    pose_goal.position.x = current_pose.pose.position.x+0.2
-    pose_goal.position.y = current_pose.pose.position.y+0.1
-    pose_goal.position.z = current_pose.pose.position.z+0.1
-    move_group.set_pose_target(pose_goal)
-    rospy.loginfo("Planning trajectory...")
-    plan = move_group.plan();
+    # pose_goal = Pose()
+    # pose_goal.orientation.w = 1.0
+    # pose_goal.position.x = current_pose.pose.position.x+0.2
+    # pose_goal.position.y = current_pose.pose.position.y+0.1
+    # pose_goal.position.z = current_pose.pose.position.z+0.1
+    # move_group.set_pose_target(pose_goal)
+    # rospy.loginfo("Planning trajectory...")
+    # plan = move_group.plan();
 
-    if(len(plan.joint_trajectory.points) == 0):
-        rospy.loginfo("No plan found")
-        # exit(0)
+    # if(len(plan.joint_trajectory.points) == 0):
+    #     rospy.loginfo("No plan found")
+    #     # exit(0)
 
-    rospy.loginfo("Moving arm...")
+    # rospy.loginfo("Moving arm...")
 
-    success = move_group.execute(plan,wait=True)
+    # success = move_group.execute(plan,wait=True)
 
-    move_group.stop()
-    move_group.clear_pose_targets()
+    # move_group.stop()
+    # move_group.clear_pose_targets()
 
     rospy.spin()
 
