@@ -44,8 +44,10 @@ from control_msgs.msg import PointHeadAction, PointHeadGoal
 from grasping_msgs.msg import FindGraspableObjectsAction, FindGraspableObjectsGoal
 from geometry_msgs.msg import PoseStamped, Pose
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes
+from moveit_msgs.msg import PlaceLocation, MoveItErrorCodes, Grasp
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+
+from gpd_ros.msg import GraspConfigList
 
 # Move base using navigation stack
 class MoveBaseClient(object):
@@ -245,7 +247,74 @@ class PointHeadClient(object):
 #             if result.error_code.val == MoveItErrorCodes.SUCCESS:
 #                 return
 
+import numpy as np
+from scipy.spatial.transform import Rotation
+from transforms3d import quaternions
+# def grab_object(Pose,size):
+
+
+# def rot2quat(R):
+
+#     r = Rotation.from_dcm(R)
+#     quat = r.as_quat()
+#     return quat
+
+
+
+
+def grasp_callback(data):
+    grasp_callback.counter += 1
+    grasps = data.grasps
+    rospy.loginfo("Number of grasps received: {}".format(len(grasps)))
+
+    rospy.loginfo("going to attempt to grasp in order")
+    output_grasps = []
+    for grasp in grasps:
+        ee_pose = PoseStamped() 
+        
+
+        ee_pose.pose.position.x = grasp.position.x
+        ee_pose.pose.position.y = grasp.position.y
+        ee_pose.pose.position.z = grasp.position.z
+       
+        # rotation = np.array([[grasp.axis.x,grasp.axis.y,grasp.axis.z],[grasp.binormal.x,grasp.binormal.y,grasp.binormal.z],[grasp.approach.x,grasp.approach.y,grasp.approach.z]])
+        rotation = np.array([[grasp.approach.x,grasp.binormal.x,grasp.axis.x],[grasp.approach.y,grasp.binormal.y,grasp.axis.y],[grasp.approach.z,grasp.binormal.z,grasp.axis.z]])
+        rotate_around_y = np.array([[0,0,1],[0,1,0],[-1,0,0]])
+        rotate_around_z = np.array([[0,-1,0],[1,0,0],[0,0,1]])
+        rotation_adjusted = np.matmul(np.matmul(rotation,rotate_around_y),rotate_around_z)
+        # rotation*rotate_around_y*rotate_around_z
+        quaternion = quaternions.mat2quat(rotation_adjusted)
+        rospy.loginfo("matrix2 :{}".format(np.matmul(rotation,rotate_around_y)))
+        rospy.loginfo("matrix3 : {}".format(rotation_adjusted))
+        # rospy.loginfo("matrix2: {}".format(Rotation.fr))
+        ee_pose.pose.orientation.x = quaternion[0]
+        ee_pose.pose.orientation.y = quaternion[1]
+        ee_pose.pose.orientation.z = quaternion[2]
+        ee_pose.pose.orientation.w = quaternion[3]
+
+
+        # rospy.loginfo("pose position: {}".format(ee_pose.pose.position))
+        rospy.loginfo("pose orientation: {}".format(ee_pose.pose.orientation))
+
+
+        # ee_pose.header.frame_id="base_link"
+        ee_pose.header.frame_id= "head_camera_depth_optical_frame"
+        ee_pose.header.stamp = rospy.Time.now()
+        ee_pose.header.seq = grasp_callback.counter
+        # move_group.set_pose_target(ee_pose)
+
+        # move_group.go(wait=True)
+    
+        grasp_pub.publish(ee_pose)
+grasp_callback.counter=0
+
+    
+
+
+
 if __name__ == "__main__":
+    global grasp_pub
+    global move_group
     # Create a node
     rospy.init_node("demo")
 
@@ -254,6 +323,12 @@ if __name__ == "__main__":
         pass
 
 
+
+    rospy.Subscriber("/detect_grasps/clustered_grasps",GraspConfigList,grasp_callback)
+    
+    grasp_pub = rospy.Publisher("/scfms/grasp_pose",PoseStamped,queue_size=20)
+
+    
     move_group = moveit_commander.MoveGroupCommander("arm")
     arm_joints  = move_group.get_joints();
     rospy.loginfo("Joint names: {}".format(arm_joints));
@@ -293,7 +368,7 @@ if __name__ == "__main__":
 
     if(len(plan.joint_trajectory.points) == 0):
         rospy.loginfo("No plan found")
-        exit(0)
+        # exit(0)
 
     rospy.loginfo("Moving arm...")
 
@@ -302,8 +377,8 @@ if __name__ == "__main__":
     move_group.stop()
     move_group.clear_pose_targets()
 
+    rospy.spin()
 
-    
 
 
     
