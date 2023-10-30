@@ -78,12 +78,12 @@ int main(int argc, char ** argv){
     ros::NodeHandle n;
 
     ROS_INFO("waiting for information on topic [/head_camera/depth_registered/points]");
-    output = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/inv_background",1000);
-    box_removed = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/background",1000);
+    output = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/inv_background",10);
+    box_removed = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/background",10);
 
     
 
-    ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1000,consensusPointCloudCallback);
+    ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",10,consensusPointCloudCallback);
 
     ros::spin();
 

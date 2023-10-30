@@ -26,10 +26,10 @@ target_link_libraries(planar_separator ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(planar_separator ${catkin_EXPORTED_TARGETS})
 
 
-add_executable(border_extractor src/border_extractor.cpp)
-target_include_directories(border_extractor PUBLIC include)
-target_link_libraries(border_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-add_dependencies(border_extractor ${catkin_EXPORTED_TARGETS})
+# add_executable(border_extractor src/border_extractor.cpp)
+# target_include_directories(border_extractor PUBLIC include)
+# target_link_libraries(border_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+# add_dependencies(border_extractor ${catkin_EXPORTED_TARGETS})
 
 
 add_executable(background_separator src/background_separator.cpp)
@@ -44,10 +44,10 @@ target_link_libraries(cluster_extractor ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(cluster_extractor ${catkin_EXPORTED_TARGETS})
 
 
-add_executable(grasp_picker src/grasp_picker.cpp)
-target_include_directories(grasp_picker PUBLIC include)
-target_link_libraries(grasp_picker ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-add_dependencies(grasp_picker ${catkin_EXPORTED_TARGETS})
+# add_executable(grasp_picker src/grasp_picker.cpp)
+# target_include_directories(grasp_picker PUBLIC include)
+# target_link_libraries(grasp_picker ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+# add_dependencies(grasp_picker ${catkin_EXPORTED_TARGETS})
 
 
 install(

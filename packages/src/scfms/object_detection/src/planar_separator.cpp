@@ -344,14 +344,14 @@ int main(int argc, char **argv)
   // std::this_thread::sleep_for(std::chrono::seconds(20));
 
   // ROS_INFO("waiting for information on topic [/removed_background]");
-  object_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/objects", 1000);
-  table_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/table_legs", 1000);
-  plane_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/plane", 1000);
-  segmented_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/segments", 1000);
-  merged_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/merged",1000);
-  gpd_pub = n.advertise<gpd_ros::CloudIndexed>(NS_OBJECTS+"/gpd_indexed",1000);
+  object_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/objects", 10);
+  table_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/table_legs", 10);
+  plane_pub = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/plane", 10);
+  segmented_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/segments", 10);
+  merged_objects_pub = n.advertise<sensor_msgs::PointCloud2>(NS_OBJECTS+"/merged",10);
+  gpd_pub = n.advertise<gpd_ros::CloudIndexed>(NS_OBJECTS+"/gpd_indexed",10);
   // ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1000,consensusPointCloudCallback);
-  ros::Subscriber sub = n.subscribe(NS_SCENE+"/inv_background", 1000, consensusPointCloudCallback);
+  ros::Subscriber sub = n.subscribe(NS_SCENE+"/inv_background", 10, consensusPointCloudCallback);
  
   ros::spin();
 

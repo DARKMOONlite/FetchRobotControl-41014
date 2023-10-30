@@ -1,33 +1,5 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2015, Fetch Robotics Inc.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Fetch Robotics Inc. nor the names of its
-#       contributors may be used to endorse or promote products derived from
-#       this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL FETCH ROBOTICS INC. BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-# Author: Michael Ferguson
-
 import copy
 import actionlib
 import rospy
@@ -40,7 +12,7 @@ import moveit_commander
 from moveit_python.geometry import rotate_pose_msg_by_euler_angles
 
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
-from control_msgs.msg import PointHeadAction, PointHeadGoal
+from control_msgs.msg import PointHeadAction, PointHeadGoal, GripperCommandAction, GripperCommandGoal
 from grasping_msgs.msg import FindGraspableObjectsAction, FindGraspableObjectsGoal
 from geometry_msgs.msg import PoseStamped, Pose
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
@@ -58,6 +30,7 @@ class MoveBaseClient(object):
         self.client = actionlib.SimpleActionClient("move_base", MoveBaseAction)
         rospy.loginfo("Waiting for move_base...")
         self.client.wait_for_server()
+        rospy.loginfo("...connected.")
 
     def goto(self, x, y, theta, frame="map"):
         move_goal = MoveBaseGoal()
@@ -110,6 +83,7 @@ class PointHeadClient(object):
         self.client = actionlib.SimpleActionClient("head_controller/point_head", PointHeadAction)
         rospy.loginfo("Waiting for head_controller...")
         self.client.wait_for_server()
+        rospy.loginfo("...connected.")
 
     def look_at(self, x, y, z, frame, duration=1.0):
         goal = PointHeadGoal()
@@ -122,132 +96,37 @@ class PointHeadClient(object):
         self.client.send_goal(goal)
         self.client.wait_for_result()
 
-# # Tools for grasping
-# class GraspingClient(object):
+class GripperClient(object):
 
-#     def __init__(self):
-#         self.scene = PlanningSceneInterface("base_link")
-#         self.pickplace = PickPlaceInterface("arm", "gripper", verbose=True)
-#         self.move_group = MoveGroupInterface("arm", "base_link")
+    def __init__(self):
+        rospy.loginfo("Waiting for gripper_controller...")
+        self.client = actionlib.SimpleActionClient("gripper_controller/gripper_action", GripperCommandAction)
+        self.client.wait_for_server()
+        rospy.loginfo("...connected.")
 
-#         find_topic = "basic_grasping_perception/find_objects"
-#         rospy.loginfo("Waiting for %s..." % find_topic)
-#         self.find_client = actionlib.SimpleActionClient(find_topic, FindGraspableObjectsAction)
-#         self.find_client.wait_for_server()
+        self.max = 0.1
+        self.min = 0.0
 
-#     def updateScene(self):
-#         # find objects
-#         goal = FindGraspableObjectsGoal()
-#         goal.plan_grasps = True
-#         self.find_client.send_goal(goal)
-#         self.find_client.wait_for_result(rospy.Duration(5.0))
-#         find_result = self.find_client.get_result()
+    def open(self, wait=True, timeout=5.0):
+        self.move(0.1, 10.0, wait=wait, timeout=timeout)
 
-#         # remove previous objects
-#         for name in self.scene.getKnownCollisionObjects():
-#             self.scene.removeCollisionObject(name, use_service=False)
-#         for name in self.scene.getKnownAttachedObjects():
-#             self.scene.removeAttachedObject(name, use_service=False)
-#         self.scene.waitForSync()
+    def close(self, wait=True, timeout=5.0):
+        self.move(0.0, 10.0, wait=wait, timeout=timeout)
 
-#         # insert objects to scene
-#         idx = -1
-#         for obj in find_result.objects:
-#             idx += 1
-#             obj.object.name = "object%d"%idx
-#             self.scene.addSolidPrimitive(obj.object.name,
-#                                          obj.object.primitives[0],
-#                                          obj.object.primitive_poses[0],
-#                                          use_service=False)
+    def move(self, position, max_effort=10.0, wait=True, timeout=5.0):
+        if position > self.max or position < self.min:
+            rospy.logerr("Gripper position must be between {} and {}".format(self.min, self.max))
+            return False
+        goal = GripperCommandGoal()
+        goal.command.max_effort= max_effort
+        goal.command.position = position
+        self.client.send_goal(goal)
+        if wait:
+            self.client.wait_for_result(rospy.Duration(timeout))
 
-#         for obj in find_result.support_surfaces:
-#             # extend surface to floor, and make wider since we have narrow field of view
-#             height = obj.primitive_poses[0].position.z
-#             obj.primitives[0].dimensions = [obj.primitives[0].dimensions[0],
-#                                             1.5,  # wider
-#                                             obj.primitives[0].dimensions[2] + height]
-#             obj.primitive_poses[0].position.z += -height/2.0
+        return self.client.get_result()
 
-#             # add to scene
-#             self.scene.addSolidPrimitive(obj.name,
-#                                          obj.primitives[0],
-#                                          obj.primitive_poses[0],
-#                                          use_service=False)
-#         self.scene.waitForSync()
 
-#         # store for grasping
-#         self.objects = find_result.objects
-#         self.surfaces = find_result.support_surfaces
-
-#     def getGraspableCube(self):
-#         graspable = None
-#         for obj in self.objects:
-#             # need grasps
-#             if len(obj.grasps) < 1:
-#                 continue
-#             # check size
-#             if obj.object.primitives[0].dimensions[0] < 0.05 or \
-#                obj.object.primitives[0].dimensions[0] > 0.07 or \
-#                obj.object.primitives[0].dimensions[0] < 0.05 or \
-#                obj.object.primitives[0].dimensions[0] > 0.07 or \
-#                obj.object.primitives[0].dimensions[0] < 0.05 or \
-#                obj.object.primitives[0].dimensions[0] > 0.07:
-#                 continue
-#             # has to be on table
-#             if obj.object.primitive_poses[0].position.z < 0.5:
-#                 continue
-#             return obj.object, obj.grasps
-#         # nothing detected
-#         return None, None
-
-#     def getSupportSurface(self, name):
-#         for surface in self.support_surfaces:
-#             if surface.name == name:
-#                 return surface
-#         return None
-
-#     def getPlaceLocation(self):
-#         pass
-
-#     def pick(self, block, grasps):
-#         success, pick_result = self.pickplace.pick_with_retry(block.name,
-#                                                               grasps,
-#                                                               support_name=block.support_surface,
-#                                                               scene=self.scene)
-#         self.pick_result = pick_result
-#         return success
-
-#     def place(self, block, pose_stamped):
-#         places = list()
-#         l = PlaceLocation()
-#         l.place_pose.pose = pose_stamped.pose
-#         l.place_pose.header.frame_id = pose_stamped.header.frame_id
-
-#         # copy the posture, approach and retreat from the grasp used
-#         l.post_place_posture = self.pick_result.grasp.pre_grasp_posture
-#         l.pre_place_approach = self.pick_result.grasp.pre_grasp_approach
-#         l.post_place_retreat = self.pick_result.grasp.post_grasp_retreat
-#         places.append(copy.deepcopy(l))
-#         # create another several places, rotate each by 360/m degrees in yaw direction
-#         m = 16 # number of possible place poses
-#         pi = 3.141592653589
-#         for i in range(0, m-1):
-#             l.place_pose.pose = rotate_pose_msg_by_euler_angles(l.place_pose.pose, 0, 0, 2 * pi / m)
-#             places.append(copy.deepcopy(l))
-
-#         success, place_result = self.pickplace.place_with_retry(block.name,
-#                                                                 places,
-#                                                                 scene=self.scene)
-#         return success
-
-#     def tuck(self):
-#         joints = ["shoulder_pan_joint", "shoulder_lift_joint", "upperarm_roll_joint",
-#                   "elbow_flex_joint", "forearm_roll_joint", "wrist_flex_joint", "wrist_roll_joint"]
-#         pose = [1.32, 1.40, -0.2, 1.72, 0.0, 1.66, 0.0]
-#         while not rospy.is_shutdown():
-#             result = self.move_group.moveToJointPosition(joints, pose, 0.02)
-#             if result.error_code.val == MoveItErrorCodes.SUCCESS:
-#                 return
 
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -264,56 +143,90 @@ from transforms3d import quaternions
 
 
 
-def grasp_callback(data):
-    grasp_callback.counter += 1
-    grasps = data.grasps
-    rospy.loginfo("Number of grasps received: {}".format(len(grasps)))
+# def grasp_callback(data):
+#     grasp_callback.counter += 1
+#     grasps = data.grasps
+#     rospy.loginfo("Number of grasps received: {}".format(len(grasps)))
 
-    rospy.loginfo("going to attempt to grasp in order")
-    output_grasps = []
-    for grasp in grasps:
-        ee_pose = PoseStamped() 
+#     rospy.loginfo("going to attempt to grasp in order")
+#     output_grasps = []
+#     for grasp in grasps:
+#         ee_pose = PoseStamped() 
         
 
-        ee_pose.pose.position.x = grasp.position.x
-        ee_pose.pose.position.y = grasp.position.y
-        ee_pose.pose.position.z = grasp.position.z
+#         ee_pose.pose.position.x = grasp.position.x
+#         ee_pose.pose.position.y = grasp.position.y
+#         ee_pose.pose.position.z = grasp.position.z
        
-        # rotation = np.array([[grasp.axis.x,grasp.axis.y,grasp.axis.z],[grasp.binormal.x,grasp.binormal.y,grasp.binormal.z],[grasp.approach.x,grasp.approach.y,grasp.approach.z]])
-        rotation = np.array([[grasp.approach.x,grasp.binormal.x,grasp.axis.x],[grasp.approach.y,grasp.binormal.y,grasp.axis.y],[grasp.approach.z,grasp.binormal.z,grasp.axis.z]])
-        rotate_around_y = np.array([[0,0,1],[0,1,0],[-1,0,0]])
-        rotate_around_z = np.array([[0,-1,0],[1,0,0],[0,0,1]])
-        rotation_adjusted = np.matmul(np.matmul(rotate_around_y,rotate_around_z),rotation)
-        # rotation*rotate_around_y*rotate_around_z
-        quaternion = quaternions.mat2quat(rotation)
-        rospy.loginfo("matrix2 :{}".format(np.matmul(rotation,rotate_around_y)))
-        rospy.loginfo("matrix3 : {}".format(rotation_adjusted))
-        # rospy.loginfo("matrix2: {}".format(Rotation.fr))
-        ee_pose.pose.orientation.x = quaternion[0]
-        ee_pose.pose.orientation.y = quaternion[1]
-        ee_pose.pose.orientation.z = quaternion[2]
-        ee_pose.pose.orientation.w = quaternion[3]
+#         # rotation = np.array([[grasp.axis.x,grasp.axis.y,grasp.axis.z],[grasp.binormal.x,grasp.binormal.y,grasp.binormal.z],[grasp.approach.x,grasp.approach.y,grasp.approach.z]])
+#         rotation = np.array([[grasp.approach.x,grasp.binormal.x,grasp.axis.x],[grasp.approach.y,grasp.binormal.y,grasp.axis.y],[grasp.approach.z,grasp.binormal.z,grasp.axis.z]])
+#         rotate_around_y = np.array([[0,0,1],[0,1,0],[-1,0,0]])
+#         rotate_around_z = np.array([[0,-1,0],[1,0,0],[0,0,1]])
+#         rotation_adjusted = np.matmul(np.matmul(rotate_around_y,rotate_around_z),rotation)
+#         # rotation*rotate_around_y*rotate_around_z
+#         quaternion = quaternions.mat2quat(rotation)
+#         rospy.loginfo("matrix2 :{}".format(np.matmul(rotation,rotate_around_y)))
+#         rospy.loginfo("matrix3 : {}".format(rotation_adjusted))
+#         # rospy.loginfo("matrix2: {}".format(Rotation.fr))
+#         ee_pose.pose.orientation.x = quaternion[0]
+#         ee_pose.pose.orientation.y = quaternion[1]
+#         ee_pose.pose.orientation.z = quaternion[2]
+#         ee_pose.pose.orientation.w = quaternion[3]
 
 
-        # rospy.loginfo("pose position: {}".format(ee_pose.pose.position))
-        rospy.loginfo("pose orientation: {}".format(ee_pose.pose.orientation))
+#         # rospy.loginfo("pose position: {}".format(ee_pose.pose.position))
+#         rospy.loginfo("pose orientation: {}".format(ee_pose.pose.orientation))
 
 
-        # ee_pose.header.frame_id="base_link"
-        ee_pose.header.frame_id= "head_camera_depth_optical_frame"
-        ee_pose.header.stamp = rospy.Time.now()
-        ee_pose.header.seq = grasp_callback.counter
-        # 
+#         # ee_pose.header.frame_id="base_link"
+#         ee_pose.header.frame_id= "head_camera_depth_optical_frame"
+#         ee_pose.header.stamp = rospy.Time.now()
+#         ee_pose.header.seq = grasp_callback.counter
+#         # 
 
-        # 
+#         # 
     
-        grasp_pub.publish(ee_pose)
-grasp_callback.counter=0
+#         grasp_pub.publish(ee_pose)
+# grasp_callback.counter=0
 
+
+def translate_pose(stampedpose,translation):
+    from pyquaternion import Quaternion
+    q = Quaternion(stampedpose.pose.orientation.w,stampedpose.pose.orientation.x,stampedpose.pose.orientation.y,stampedpose.pose.orientation.z)
+    v = np.array(translation)
+    v_rotated = q.rotate(v)
+    new_pose = copy.deepcopy(stampedpose)
+    new_pose.pose.position.x += v_rotated[0]
+    new_pose.pose.position.y += v_rotated[1] 
+    new_pose.pose.position.z += v_rotated[2]
+    return new_pose
+
+
+def plan_motion(pose,frame,wait=True):
+    move_group.set_pose_target(pose)
+    move_group.set_pose_reference_frame(frame)
+    move_group.set_planning_time(10)
+    rospy.loginfo("pose position: {}".format(pose_transformed.pose.position))
+
+    plan = move_group.plan();
+    if(len(plan.joint_trajectory.points) == 0):
+        rospy.loginfo("No plan found")
+        return False
+
+    rospy.loginfo("Moving arm...")
+
+    success = move_group.execute(plan,wait=True)
+    move_group.stop()
+    move_group.clear_pose_targets()
+    return True
 
 def visualisation_callback(data):
+    if(visualisation_callback.running == True):
+        return
     if len(data.markers) < 1:
         return
+    
+    visualisation_callback.running=True
 
     rospy.loginfo("Number of grasps received: {}".format(len(data.markers)))
     
@@ -327,15 +240,11 @@ def visualisation_callback(data):
     ee_pose.header.frame_id= "head_camera_depth_optical_frame"
     ee_pose.header.stamp = rospy.Time.now()
     ee_pose.header.seq = visualisation_callback.counter
-    from pyquaternion import Quaternion
 
-    q = Quaternion(ee_pose.pose.orientation.w,ee_pose.pose.orientation.x,ee_pose.pose.orientation.y,ee_pose.pose.orientation.z)
-    v = np.array([0,-0.015,0])
-    v_rotated = q.rotate(v)
-    ee_pose.pose.position.x += v_rotated[0]
-    ee_pose.pose.position.y += v_rotated[1] 
-    ee_pose.pose.position.z += v_rotated[2]
-    grasp_pub.publish(ee_pose)
+    ee_pose = translate_pose(ee_pose,[0,-0.015,0])
+
+    
+
     visualisation_callback.counter += 1
 
 
@@ -344,93 +253,79 @@ def visualisation_callback(data):
     tranform = tf_buffer.lookup_transform("map",ee_pose.header.frame_id,rospy.Time(0),rospy.Duration(1.0))
     pose_transformed = tf2_geometry_msgs.do_transform_pose(ee_pose,tranform)
 
-    temp_grasp_pub.publish(pose_transformed)
+
+    approach_pose = translate_pose(pose_transformed,[-0.1,0,0])    
+    grasp_pub.publish(pose_transformed)
+    temp_grasp_pub.publish(approach_pose)
 
 
-    move_group.set_pose_target(pose_transformed)
-    plan = move_group.plan();
-    if(len(plan.joint_trajectory.points) == 0):
-        rospy.loginfo("No plan found")
+    if(~plan_motion(approach_pose,"map",wait=True)):
+        visualisation_callback.running=False
+        return  
+   
+    if(~plan_motion(pose_transformed,"map",wait=True)):
+        visualisation_callback.running=False
         return
 
-    rospy.loginfo("Moving arm...")
+    
+    visualisation_callback.running=False    
+    
 
-    success = move_group.execute(plan,wait=True)
-    move_group.stop()
-    move_group.clear_pose_targets()
-
-
+visualisation_callback.running=False
 visualisation_callback.counter=0
 
 
 
 if __name__ == "__main__":
+
+    #? global variables
     global grasp_pub
     global move_group
     global temp_grasp_pub
-    # Create a node
-    rospy.init_node("demo")
+    global gripperaction
 
-    # Make sure sim time is working
+    # Create a node
+    rospy.init_node("scfms_demo")
     while not rospy.Time.now():
         pass
 
 
-
+    #? Subscribers and publishers
     # rospy.Subscriber("/detect_grasps/clustered_grasps",GraspConfigList,grasp_callback)
     rospy.Subscriber("/detect_grasps/plot_grasps",MarkerArray,visualisation_callback)
     grasp_pub = rospy.Publisher("/scfms/grasp_pose",PoseStamped,queue_size=20)
-
     temp_grasp_pub = rospy.Publisher("scfms/temp_pose",PoseStamped,queue_size=20)
     
+    #? Moveit commander
     move_group = moveit_commander.MoveGroupCommander("arm")
     arm_joints  = move_group.get_joints();
     rospy.loginfo("Joint names: {}".format(arm_joints));
 
 
-    # Setup clients
+    #? Setup action clients for individual joint control
     move_base = MoveBaseClient()
     torso_action = FollowTrajectoryClient("torso_controller", ["torso_lift_joint"])
-
-
-
     arm_action = FollowTrajectoryClient("arm_controller",arm_joints)
-
     head_action = PointHeadClient()
+    gripper_action = GripperClient()
+
+
+
+    #? Setup scene
     rospy.loginfo("looking at the table...")
-    head_action.look_at(1.0, 0.0, 1, "base_link")
-
-    # grasping_client = GraspingClient()
+    head_action.look_at(1.0, 0.0, 0.8, "base_link")
+    rospy.loginfo("moving arm...")
     arm_action.move_to([1.571, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
-
-
+    rospy.loginfo("closing gripper...")
+    gripper_action.close()
+    rospy.loginfo("opening gripper...")
+    gripper_action.open()
     # rospy.loginfo("Raising torso...")
     # torso_action.move_to([0.4])
 
 
-    current_pose = move_group.get_current_pose()
 
-    rospy.loginfo("Current pose: x: {} y: {} z: {}".format(current_pose.pose.position.x,current_pose.pose.position.y,current_pose.pose.position.z))
 
-    # pose_goal = Pose()
-    # pose_goal.orientation.w = 1.0
-    # pose_goal.position.x = current_pose.pose.position.x+0.2
-    # pose_goal.position.y = current_pose.pose.position.y+0.1
-    # pose_goal.position.z = current_pose.pose.position.z+0.1
-    # move_group.set_pose_target(pose_goal)
-    # rospy.loginfo("Planning trajectory...")
-    # plan = move_group.plan();
-
-    # if(len(plan.joint_trajectory.points) == 0):
-    #     rospy.loginfo("No plan found")
-    #     # exit(0)
-
-    # rospy.loginfo("Moving arm...")
-
-    # success = move_group.execute(plan,wait=True)
-
-    # move_group.stop()
-    # move_group.clear_pose_targets()
 
     rospy.spin()
 
