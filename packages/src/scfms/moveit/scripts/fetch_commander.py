@@ -203,10 +203,10 @@ def translate_pose(stampedpose,translation):
 
 
 def plan_motion(pose,frame,wait=True):
-    move_group.set_pose_target(pose)
+    move_group.set_pose_target(pose.pose)
     move_group.set_pose_reference_frame(frame)
     move_group.set_planning_time(10)
-    rospy.loginfo("pose position: {}".format(pose_transformed.pose.position))
+    rospy.loginfo("pose position: {}".format(pose.pose.position))
 
     plan = move_group.plan();
     if(len(plan.joint_trajectory.points) == 0):
@@ -218,7 +218,10 @@ def plan_motion(pose,frame,wait=True):
     success = move_group.execute(plan,wait=True)
     move_group.stop()
     move_group.clear_pose_targets()
+    
     return True
+
+
 
 def visualisation_callback(data):
     if(visualisation_callback.running == True):
@@ -276,6 +279,11 @@ visualisation_callback.counter=0
 
 
 
+def createscene():
+    rospy.loginfo("creating/updating scene")
+    
+    scene.addBox("table",0.8,1.6,1,1.8,0,0.2, frame_id="odom")
+
 if __name__ == "__main__":
 
     #? global variables
@@ -283,6 +291,7 @@ if __name__ == "__main__":
     global move_group
     global temp_grasp_pub
     global gripperaction
+    global scene
 
     # Create a node
     rospy.init_node("scfms_demo")
@@ -300,7 +309,13 @@ if __name__ == "__main__":
     move_group = moveit_commander.MoveGroupCommander("arm")
     arm_joints  = move_group.get_joints();
     rospy.loginfo("Joint names: {}".format(arm_joints));
+    #? create scene, objects come in while loop to update position during tasks
 
+    scene= PlanningSceneInterface("odom")
+
+    
+    # collision_objects = scene.getKnownCollisionObjects()
+    # rospy.loginfo("Collision objects: {}".format(collision_objects))
 
     #? Setup action clients for individual joint control
     move_base = MoveBaseClient()
@@ -327,7 +342,8 @@ if __name__ == "__main__":
 
 
 
-    rospy.spin()
+    while 1:
+        createscene()
 
 
 

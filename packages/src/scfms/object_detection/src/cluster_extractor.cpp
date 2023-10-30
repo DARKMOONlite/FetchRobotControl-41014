@@ -131,12 +131,12 @@ int main(int argc, char** argv){
     ros::NodeHandle n;
 
     ROS_INFO("waiting for information on topic [%s]",sub_topic.c_str());
-    clusters = n.advertise<sensor_msgs::PointCloud2>("/object_clusters",10);
+    clusters = n.advertise<sensor_msgs::PointCloud2>("/object_clusters",2);
     // box_removed = n.advertise<sensor_msgs::PointCloud2>("/background",1000);
 
     
 
-    ros::Subscriber sub = n.subscribe(sub_topic,10,clusterExtractionCallback);
+    ros::Subscriber sub = n.subscribe(sub_topic,2,clusterExtractionCallback);
 
     ros::spin();
 

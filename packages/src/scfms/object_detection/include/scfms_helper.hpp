@@ -44,7 +44,7 @@ const std::string NS_SCENE = "/scfms_scene", NS_OBJECTS = "/scfms_objects";
 sensor_msgs::PointCloud2 pcl2roscloud(pcl::PointCloud<pcl::PointXYZ> cloud, colour _colour = (colour){255,255,255}){
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr final(new pcl::PointCloud<pcl::PointXYZRGBA>());
     pcl::copyPointCloud(cloud,*final);
-    ROS_WARN("colour values [%i %i %i]",_colour.r,_colour.g,_colour.b);
+    // ROS_WARN("colour values [%i %i %i]",_colour.r,_colour.g,_colour.b);
     // for(auto point: *final){
     //     point.r = _colour.r;
     //     point.g = _colour.b;

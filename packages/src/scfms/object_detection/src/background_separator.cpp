@@ -28,13 +28,16 @@ ros::Publisher output;
 ros::Publisher box_removed;
 
 
+
+
+
 //? taken from the Point cloud library example code http://pointclouds.org/documentation/tutorials/planar_segmentation.html#planar-segmentation
 
 
 
 void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
 
-    ROS_INFO("Point Cloud msg Received ");
+    ros::Time start_time = ros::Time::now(); // get the start time
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
     pcl::PointCloud<pcl::PointXYZ>::Ptr final(new pcl::PointCloud<pcl::PointXYZ>());
 
@@ -61,9 +64,12 @@ void consensusPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr & msg){
     box_removed.publish(pcl2roscloud(removed,*cloud)); 
 
 
-    ROS_INFO("num remaining pts [%i]",indicies.size());
-     ROS_INFO("num removed pts [%i]",removed.size());
+    // ROS_INFO("num remaining pts [%i]",indicies.size());
+    //  ROS_INFO("num removed pts [%i]",removed.size());
     
+    ros::Time end_time = ros::Time::now(); // get the end time
+    ros::Duration duration = end_time - start_time; // calculate the duration
+    // ROS_INFO("Background Separation took [%f] seconds to complete, num pts remaining [%i]", duration.toSec(),indicies.size()); // print the duration
 }
 
 
@@ -78,12 +84,12 @@ int main(int argc, char ** argv){
     ros::NodeHandle n;
 
     ROS_INFO("waiting for information on topic [/head_camera/depth_registered/points]");
-    output = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/inv_background",10);
-    box_removed = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/background",10);
+    output = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/inv_background",1);
+    box_removed = n.advertise<sensor_msgs::PointCloud2>(NS_SCENE+"/background",1);
 
     
 
-    ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",10,consensusPointCloudCallback);
+    ros::Subscriber sub = n.subscribe("/head_camera/depth_registered/points",1,consensusPointCloudCallback);
 
     ros::spin();
 
