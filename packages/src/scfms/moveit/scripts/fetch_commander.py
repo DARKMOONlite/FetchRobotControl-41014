@@ -257,18 +257,25 @@ def visualisation_callback(data):
     pose_transformed = tf2_geometry_msgs.do_transform_pose(ee_pose,tranform)
 
 
-    approach_pose = translate_pose(pose_transformed,[-0.1,0,0])    
+    approach_pose = translate_pose(pose_transformed,[-0.15,0,0])    
     grasp_pub.publish(pose_transformed)
     temp_grasp_pub.publish(approach_pose)
 
 
     if(~plan_motion(approach_pose,"map",wait=True)):
         visualisation_callback.running=False
+        arm_action.move_to([1.571, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
         return  
    
     if(~plan_motion(pose_transformed,"map",wait=True)):
         visualisation_callback.running=False
+        arm_action.move_to([1.571, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
         return
+    else:
+        gripper_action.close()
+
+        plan_motion(approach_pose,"map",wait=True)
+        arm_action.move_to([1.571, 0.0, 0.0, -1.571, 0.0, 0.785,0.0])
 
     
     visualisation_callback.running=False    
@@ -280,10 +287,13 @@ visualisation_callback.counter=0
 
 
 def createscene():
-    rospy.loginfo("creating/updating scene")
+    createscene.counter += 1
+    
+    if createscene.counter % 50 == 0: # print less often
+        rospy.loginfo("creating/updating scene x50")
     
     scene.addBox("table",0.8,1.6,1,1.8,0,0.2, frame_id="odom")
-
+createscene.counter=0
 if __name__ == "__main__":
 
     #? global variables

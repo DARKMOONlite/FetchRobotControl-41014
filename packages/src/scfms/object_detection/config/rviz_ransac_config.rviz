@@ -20,6 +20,8 @@ Panels:
         - /Axes2
         - /Axes3
         - /Pose2
+        - /PlanningScene1
+        - /PlanningScene1/Scene Geometry1
       Splitter Ratio: 0.4117647111415863
     Tree Height: 1088
   - Class: rviz/Selection
@@ -211,7 +213,8 @@ Visualization Manager:
       Marker Topic: /detect_grasps/plot_grasps
       Name: MarkerArray
       Namespaces:
-        {}
+        finger: true
+        hand_base: true
       Queue Size: 10
       Value: true
     - Class: rviz/MarkerArray
@@ -568,7 +571,7 @@ Visualization Manager:
       Robot Description: robot_description
       Scene Geometry:
         Scene Alpha: 0.8999999761581421
-        Scene Color: 50; 230; 50
+        Scene Color: 206; 92; 0
         Scene Display Time: 0.009999999776482582
         Show Scene Geometry: true
         Voxel Coloring: Z-Axis
@@ -773,10 +776,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.08479907363653183
+      Pitch: 0.024799078702926636
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.4897801876068115
+      Yaw: 3.859783411026001
     Saved: ~
 Window Geometry:
   Displays:
